@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en" data-sap-theme="sap_fiori_3_dark">
+<head>
+<meta charset="UTF-8">
+<title>BAPI</title>
+
+<!-- SAP 72 Font — official SAP brand typeface from @sap-theming npm package -->
+<style>
+@font-face{font-family:"72";font-weight:300;font-style:normal;
+  src:url("https://unpkg.com/@sap-theming/theming-base-content/content/Base/baseLib/baseTheme/fonts/72-Light.woff2")format("woff2")}
+@font-face{font-family:"72";font-weight:400;font-style:normal;
+  src:url("https://unpkg.com/@sap-theming/theming-base-content/content/Base/baseLib/baseTheme/fonts/72-Regular.woff2")format("woff2")}
+@font-face{font-family:"72";font-weight:700;font-style:normal;
+  src:url("https://unpkg.com/@sap-theming/theming-base-content/content/Base/baseLib/baseTheme/fonts/72-Bold.woff2")format("woff2")}
+@font-face{font-family:"72full";font-weight:400;font-style:normal;
+  src:url("https://unpkg.com/@sap-theming/theming-base-content/content/Base/baseLib/baseTheme/fonts/72-Regular-full.woff2")format("woff2")}
+/* SAP Icons — official icon glyph font */
+@font-face{font-family:"SAP-icons";font-weight:normal;font-style:normal;
+  src:url("https://unpkg.com/@sap-theming/theming-base-content/content/Base/baseLib/baseTheme/fonts/SAP-icons.woff2")format("woff2")}
+</style>
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   SAP AUTHENTIC THEME DEFINITIONS — ALL VALUES EMBEDDED
+   ───────────────────────────────────────────────────────────────────
+   Source: @sap-theming/theming-base-content (public npm package)
+   Five dark themes matching exact SAP GUI / Fiori design tokens.
+
+   DESIGN DNA per theme:
+   ┌─────────────────────────────────────────────────────────────────
+   │ EVE  sap_horizon_dark    — S/4HANA 2022+ · navy blue · rounded
+   │ QTZ  sap_fiori_3_dark    — Fiori 3 · steel blue · slight round
+   │ BLZ  sap_belize_deep     — Fiori 2 · deep navy · FLAT corners
+   │ HCH  sap_horizon_hcb     — HC Black Horizon · black · cyan acc.
+   │ HCQ  sap_fiori_3_hcb     — HC Black Quartz · black · blue acc.
+   └─────────────────────────────────────────────────────────────────
+
+   Border-radius philosophy:
+     Horizon      → 0.5rem panels / 0.375rem fields  (rounded)
+     Quartz       → 0.25rem all                      (subtle)
+     Belize       → 0rem all                         (FLAT — classic!)
+     HCB (both)   → match parent family
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Evening Horizon Dark ────────────────────────────────────── */
+html[data-sap-theme="sap_horizon_dark"] {
+  --sapBackgroundColor:#1d2d3e; --sapBaseColor:#223548;
+  --sapShellColor:#1d2d3e; --sapShell_TextColor:#ffffff; --sapShell_BorderColor:#223548;
+  --sapHighlightColor:#0070f2; --sapBrandColor:#0070f2;
+  --sapTextColor:#ffffff; --sapContent_LabelColor:#8696a9;
+  --sapContent_DisabledTextColor:#5b738b;
+  --sapContent_ForegroundColor:#354a5e; --sapContent_ForegroundBorderColor:#5b738b;
+  --sapField_Background:#223548; --sapField_BorderColor:#5b738b;
+  --sapField_TextColor:#ffffff; --sapField_PlaceholderTextColor:#5b738b;
+  --sapField_HoverBorderColor:#0070f2;
+  --sapList_Background:#1d2d3e; --sapList_HoverBackground:#223548;
+  --sapList_SelectionBackgroundColor:#0a2e6c; --sapList_BorderColor:#354a5e;
+  --sapList_TextColor:#ffffff;
+  --sapButton_Background:#354a5e; --sapButton_BorderColor:#5b738b;
+  --sapButton_TextColor:#ffffff; --sapButton_Hover_Background:#223548;
+  --sapButton_Emphasized_Background:#0070f2; --sapButton_Emphasized_TextColor:#ffffff;
+  --sapButton_Emphasized_BorderColor:#0070f2;
+  --sapGroup_TitleBackground:#354a5e; --sapGroup_ContentBackground:#223548;
+  --sapGroup_BorderColor:#5b738b; --sapTile_Background:#223548; --sapTile_BorderColor:#354a5e;
+  --sapPositiveColor:#30914c; --sapNegativeColor:#aa0808;
+  --sapCriticalColor:#e9730c; --sapInformativeColor:#0070f2;
+  --sapScrollBar_FaceColor:#5b738b; --sapScrollBar_TrackColor:transparent;
+  --sapContent_BorderRadius:0.5rem; --sapElement_BorderRadius:0.375rem;
+  --sapButton_BorderRadius:0.5rem; --sapField_BorderRadius:0.375rem;
+  --sapFontFamily:"72","72full",Arial,Helvetica,sans-serif;
+  --sapFontSize:0.875rem; --sapFontLargeSize:1rem; --sapFontSmallSize:0.75rem;
+  --_code_bg:#0f1e2e; --_code_border:#223548; --_msg_accent_border:#0070f2;
+  --_msg_bapi_bg:#182536; --_msg_user_bg:#223548;
+}
+
+/* ── 2. Quartz Dark ─────────────────────────────────────────────── */
+html[data-sap-theme="sap_fiori_3_dark"] {
+  --sapBackgroundColor:#1c2228; --sapBaseColor:#29313a;
+  --sapShellColor:#354a5e; --sapShell_TextColor:#ffffff; --sapShell_BorderColor:#243540;
+  --sapHighlightColor:#0a6ed1; --sapBrandColor:#0a6ed1;
+  --sapTextColor:#f7f7f7; --sapContent_LabelColor:#89919a;
+  --sapContent_DisabledTextColor:#6a6d70;
+  --sapContent_ForegroundColor:#354a5e; --sapContent_ForegroundBorderColor:#3d4d5e;
+  --sapField_Background:#29313a; --sapField_BorderColor:#8c9ba5;
+  --sapField_TextColor:#f7f7f7; --sapField_PlaceholderTextColor:#6a6d70;
+  --sapField_HoverBorderColor:#0a6ed1;
+  --sapList_Background:#1c2228; --sapList_HoverBackground:#29313a;
+  --sapList_SelectionBackgroundColor:#0c3a6d; --sapList_BorderColor:#3d4d5e;
+  --sapList_TextColor:#f7f7f7;
+  --sapButton_Background:#29313a; --sapButton_BorderColor:#8c9ba5;
+  --sapButton_TextColor:#f7f7f7; --sapButton_Hover_Background:#354a5e;
+  --sapButton_Emphasized_Background:#0a6ed1; --sapButton_Emphasized_TextColor:#ffffff;
+  --sapButton_Emphasized_BorderColor:#0a6ed1;
+  --sapGroup_TitleBackground:#354a5e; --sapGroup_ContentBackground:#29313a;
+  --sapGroup_BorderColor:#3d4d5e; --sapTile_Background:#29313a; --sapTile_BorderColor:#3d4d5e;
+  --sapPositiveColor:#107e3e; --sapNegativeColor:#bb0000;
+  --sapCriticalColor:#e9730c; --sapInformativeColor:#0a6ed1;
+  --sapScrollBar_FaceColor:#8c9ba5; --sapScrollBar_TrackColor:transparent;
+  --sapContent_BorderRadius:0.25rem; --sapElement_BorderRadius:0.25rem;
+  --sapButton_BorderRadius:0.25rem; --sapField_BorderRadius:0.25rem;
+  --sapFontFamily:"72","72full",Arial,Helvetica,sans-serif;
+  --sapFontSize:0.875rem; --sapFontLargeSize:1rem; --sapFontSmallSize:0.75rem;
+  --_code_bg:#141a1f; --_code_border:#29313a; --_msg_accent_border:#0a6ed1;
+  --_msg_bapi_bg:#1e262e; --_msg_user_bg:#29313a;
+}
+
+/* ── 3. Belize Deep ─────────────────────────────────────────────── */
+html[data-sap-theme="sap_belize_deep"] {
+  --sapBackgroundColor:#213146; --sapBaseColor:#2e4362;
+  --sapShellColor:#213146; --sapShell_TextColor:#ffffff; --sapShell_BorderColor:#1a2a3a;
+  --sapHighlightColor:#427cac; --sapBrandColor:#427cac;
+  --sapTextColor:#ffffff; --sapContent_LabelColor:#7b9ab4;
+  --sapContent_DisabledTextColor:#5e7e99;
+  --sapContent_ForegroundColor:#1a3050; --sapContent_ForegroundBorderColor:#5e81a0;
+  --sapField_Background:#2e4362; --sapField_BorderColor:#5e81a0;
+  --sapField_TextColor:#ffffff; --sapField_PlaceholderTextColor:#5e7e99;
+  --sapField_HoverBorderColor:#427cac;
+  --sapList_Background:#213146; --sapList_HoverBackground:#2e4362;
+  --sapList_SelectionBackgroundColor:#1a3d6b; --sapList_BorderColor:#3a5a70;
+  --sapList_TextColor:#ffffff;
+  --sapButton_Background:#2e4362; --sapButton_BorderColor:#5e81a0;
+  --sapButton_TextColor:#ffffff; --sapButton_Hover_Background:#1a3050;
+  --sapButton_Emphasized_Background:#427cac; --sapButton_Emphasized_TextColor:#ffffff;
+  --sapButton_Emphasized_BorderColor:#427cac;
+  --sapGroup_TitleBackground:#1a3050; --sapGroup_ContentBackground:#2e4362;
+  --sapGroup_BorderColor:#5e81a0; --sapTile_Background:#2e4362; --sapTile_BorderColor:#5e81a0;
+  --sapPositiveColor:#1f8241; --sapNegativeColor:#cc1919;
+  --sapCriticalColor:#e9730c; --sapInformativeColor:#427cac;
+  --sapScrollBar_FaceColor:#5e81a0; --sapScrollBar_TrackColor:transparent;
+  --sapContent_BorderRadius:0; --sapElement_BorderRadius:0;
+  --sapButton_BorderRadius:0; --sapField_BorderRadius:0;
+  --sapFontFamily:"72","72full",Arial,Helvetica,sans-serif;
+  --sapFontSize:0.875rem; --sapFontLargeSize:1rem; --sapFontSmallSize:0.75rem;
+  --_code_bg:#192840; --_code_border:#2e4362; --_msg_accent_border:#427cac;
+  --_msg_bapi_bg:#1e2f44; --_msg_user_bg:#2e4362;
+}
+
+/* ── 4. High Contrast Black — Horizon ───────────────────────────── */
+html[data-sap-theme="sap_horizon_hcb"] {
+  --sapBackgroundColor:#000000; --sapBaseColor:#000000;
+  --sapShellColor:#000000; --sapShell_TextColor:#ffffff; --sapShell_BorderColor:#ffffff;
+  --sapHighlightColor:#00d9f5; --sapBrandColor:#00d9f5;
+  --sapTextColor:#ffffff; --sapContent_LabelColor:#ffffff;
+  --sapContent_DisabledTextColor:#7f7f7f;
+  --sapContent_ForegroundColor:#111111; --sapContent_ForegroundBorderColor:#ffffff;
+  --sapField_Background:#000000; --sapField_BorderColor:#ffffff;
+  --sapField_TextColor:#ffffff; --sapField_PlaceholderTextColor:#bbbbbb;
+  --sapField_HoverBorderColor:#00d9f5;
+  --sapList_Background:#000000; --sapList_HoverBackground:#004f5e;
+  --sapList_SelectionBackgroundColor:#004f5e; --sapList_BorderColor:#ffffff;
+  --sapList_TextColor:#ffffff;
+  --sapButton_Background:#000000; --sapButton_BorderColor:#ffffff;
+  --sapButton_TextColor:#ffffff; --sapButton_Hover_Background:#004f5e;
+  --sapButton_Emphasized_Background:#000000; --sapButton_Emphasized_TextColor:#00d9f5;
+  --sapButton_Emphasized_BorderColor:#00d9f5;
+  --sapGroup_TitleBackground:#000000; --sapGroup_ContentBackground:#000000;
+  --sapGroup_BorderColor:#ffffff; --sapTile_Background:#000000; --sapTile_BorderColor:#ffffff;
+  --sapPositiveColor:#abdb93; --sapNegativeColor:#ff8888;
+  --sapCriticalColor:#ffcc00; --sapInformativeColor:#00d9f5;
+  --sapScrollBar_FaceColor:#ffffff; --sapScrollBar_TrackColor:#000000;
+  --sapContent_BorderRadius:0.5rem; --sapElement_BorderRadius:0.375rem;
+  --sapButton_BorderRadius:0.5rem; --sapField_BorderRadius:0.375rem;
+  --sapFontFamily:"72","72full",Arial,Helvetica,sans-serif;
+  --sapFontSize:0.875rem; --sapFontLargeSize:1rem; --sapFontSmallSize:0.75rem;
+  --_code_bg:#000000; --_code_border:#ffffff; --_msg_accent_border:#00d9f5;
+  --_msg_bapi_bg:#0a0a0a; --_msg_user_bg:#000000;
+}
+
+/* ── 5. High Contrast Black — Quartz ────────────────────────────── */
+html[data-sap-theme="sap_fiori_3_hcb"] {
+  --sapBackgroundColor:#000000; --sapBaseColor:#000000;
+  --sapShellColor:#000000; --sapShell_TextColor:#ffffff; --sapShell_BorderColor:#ffffff;
+  --sapHighlightColor:#6fa8ff; --sapBrandColor:#6fa8ff;
+  --sapTextColor:#ffffff; --sapContent_LabelColor:#ffffff;
+  --sapContent_DisabledTextColor:#7f7f7f;
+  --sapContent_ForegroundColor:#111111; --sapContent_ForegroundBorderColor:#ffffff;
+  --sapField_Background:#000000; --sapField_BorderColor:#ffffff;
+  --sapField_TextColor:#ffffff; --sapField_PlaceholderTextColor:#bbbbbb;
+  --sapField_HoverBorderColor:#6fa8ff;
+  --sapList_Background:#000000; --sapList_HoverBackground:#0040b0;
+  --sapList_SelectionBackgroundColor:#0040b0; --sapList_BorderColor:#ffffff;
+  --sapList_TextColor:#ffffff;
+  --sapButton_Background:#000000; --sapButton_BorderColor:#ffffff;
+  --sapButton_TextColor:#ffffff; --sapButton_Hover_Background:#0040b0;
+  --sapButton_Emphasized_Background:#000000; --sapButton_Emphasized_TextColor:#6fa8ff;
+  --sapButton_Emphasized_BorderColor:#6fa8ff;
+  --sapGroup_TitleBackground:#000000; --sapGroup_ContentBackground:#000000;
+  --sapGroup_BorderColor:#ffffff; --sapTile_Background:#000000; --sapTile_BorderColor:#ffffff;
+  --sapPositiveColor:#abdb93; --sapNegativeColor:#ff8888;
+  --sapCriticalColor:#ffcc00; --sapInformativeColor:#6fa8ff;
+  --sapScrollBar_FaceColor:#ffffff; --sapScrollBar_TrackColor:#000000;
+  --sapContent_BorderRadius:0; --sapElement_BorderRadius:0;
+  --sapButton_BorderRadius:0; --sapField_BorderRadius:0;
+  --sapFontFamily:"72","72full",Arial,Helvetica,sans-serif;
+  --sapFontSize:0.875rem; --sapFontLargeSize:1rem; --sapFontSmallSize:0.75rem;
+  --_code_bg:#000000; --_code_border:#ffffff; --_msg_accent_border:#6fa8ff;
+  --_msg_bapi_bg:#0a0a0a; --_msg_user_bg:#000000;
+}
+
+
+/* ════════════════════════════════════════════════════════
+   GLOBAL FALLBACK — Quartz Dark loaded immediately
+   (matches html[data-sap-theme="sap_fiori_3_dark"] but
+    applies before data-sap-theme attribute is set)
+   ════════════════════════════════════════════════════════ */
+:root {
+  --sapBackgroundColor:#1c2228; --sapBaseColor:#29313a;
+  --sapShellColor:#354a5e; --sapShell_TextColor:#ffffff; --sapShell_BorderColor:#243540;
+  --sapHighlightColor:#0a6ed1; --sapBrandColor:#0a6ed1;
+  --sapTextColor:#f7f7f7; --sapContent_LabelColor:#89919a;
+  --sapContent_DisabledTextColor:#6a6d70;
+  --sapContent_ForegroundColor:#354a5e; --sapContent_ForegroundBorderColor:#3d4d5e;
+  --sapField_Background:#29313a; --sapField_BorderColor:#8c9ba5;
+  --sapField_TextColor:#f7f7f7; --sapField_PlaceholderTextColor:#6a6d70;
+  --sapField_HoverBorderColor:#0a6ed1;
+  --sapList_Background:#1c2228; --sapList_HoverBackground:#29313a;
+  --sapList_SelectionBackgroundColor:#0c3a6d; --sapList_BorderColor:#3d4d5e;
+  --sapList_TextColor:#f7f7f7;
+  --sapButton_Background:#29313a; --sapButton_BorderColor:#8c9ba5;
+  --sapButton_TextColor:#f7f7f7; --sapButton_Hover_Background:#354a5e;
+  --sapButton_Emphasized_Background:#0a6ed1; --sapButton_Emphasized_TextColor:#ffffff;
+  --sapButton_Emphasized_BorderColor:#0a6ed1;
+  --sapGroup_TitleBackground:#354a5e; --sapGroup_ContentBackground:#29313a;
+  --sapGroup_BorderColor:#3d4d5e; --sapTile_Background:#29313a; --sapTile_BorderColor:#3d4d5e;
+  --sapPositiveColor:#107e3e; --sapNegativeColor:#bb0000;
+  --sapCriticalColor:#e9730c; --sapInformativeColor:#0a6ed1;
+  --sapScrollBar_FaceColor:#8c9ba5; --sapScrollBar_TrackColor:transparent;
+  --sapContent_BorderRadius:0.25rem; --sapElement_BorderRadius:0.25rem;
+  --sapButton_BorderRadius:0.25rem; --sapField_BorderRadius:0.25rem;
+  --sapFontFamily:"72","72full",Arial,Helvetica,sans-serif;
+  --sapFontSize:0.875rem; --sapFontLargeSize:1rem; --sapFontSmallSize:0.75rem;
+  --_code_bg:#141a1f; --_code_border:#29313a; --_msg_accent_border:#0a6ed1;
+  --_msg_bapi_bg:#1e262e; --_msg_user_bg:#29313a;
+}
+
+/* ════════════════════════════════════════════════════════
+   RESET + BASE
+   ════════════════════════════════════════════════════════ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--sapScrollBar_TrackColor)}
+::-webkit-scrollbar-thumb{background:var(--sapScrollBar_FaceColor);border-radius:2px}
+.si{font-family:"SAP-icons";speak:none;font-style:normal;font-weight:normal;line-height:1;display:inline-block}
+
+html,body{width:100%;height:100%;overflow:hidden;background:transparent;
+  font-family:var(--sapFontFamily);font-size:var(--sapFontSize);
+  color:var(--sapTextColor);-webkit-font-smoothing:antialiased;user-select:none;
+  transition:background .25s}
+
+/* ── App shell ── */
+#app{width:100%;height:100%;background:var(--sapBackgroundColor);
+  border:1px solid var(--sapContent_ForegroundBorderColor);
+  border-radius:var(--sapContent_BorderRadius);
+  display:flex;flex-direction:column;overflow:hidden;position:relative;
+  transition:background .25s,border-color .25s}
+
+/* ── Collapsed ── */
+body.collapsed{width:100%;height:100%}
+body.collapsed #app{width:100%;height:100%;border-radius:1rem}
+body.collapsed #titlebar,body.collapsed #pills-wrap,
+body.collapsed #chat-area,body.collapsed #input-bar{display:none}
+body.collapsed #pet-area{border-bottom:none;padding:18px 0 10px;cursor:pointer}
+body.collapsed #collapse-expand{display:flex}
+
+/* ════════════════════════════════════════════════════════
+   SHELL BAR  (= SAP Fiori ShellBar)
+   ════════════════════════════════════════════════════════ */
+#titlebar{cursor:grab;background:var(--sapShellColor);border-bottom:1px solid var(--sapShell_BorderColor);
+  padding:0 12px;height:44px;display:flex;align-items:center;gap:6px;
+  flex-shrink:0;transition:background .25s}
+.tb-btn{width:11px;height:11px;border-radius:50%;border:none;cursor:pointer;transition:opacity .15s;flex-shrink:0}
+.tb-btn:hover{opacity:.7}
+#btn-close{background:#ff5f57}#btn-minimize{background:#febc2e}#btn-hide{background:#28c840}
+#tb-brand{display:flex;align-items:center;gap:7px;margin-left:6px;}
+#tb-logo{width:22px;height:22px;flex-shrink:0;border-radius:4px;
+  background:var(--sapHighlightColor);display:flex;align-items:center;justify-content:center;
+  transition:background .25s}
+#tb-logo-text{font-family:"72",Arial,sans-serif;font-size:7.5px;font-weight:700;
+  color:#fff;letter-spacing:.3px}
+#tb-product-name{font-family:var(--sapFontFamily);font-size:0.8125rem;font-weight:700;
+  color:var(--sapShell_TextColor);letter-spacing:.01em;white-space:nowrap;}
+#tb-actions{margin-left:auto;display:flex;align-items:center;gap:2px;}
+.tb-icon-btn{width:32px;height:32px;border:none;border-radius:50%;
+  background:transparent;color:var(--sapShell_TextColor);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s;opacity:.85}
+.tb-icon-btn:hover{background:rgba(255,255,255,.14);opacity:1}
+.tb-icon-btn .si{font-size:1rem}
+#tb-online-dot{width:7px;height:7px;border-radius:50%;
+  background:var(--sapPositiveColor);animation:sapGlow 2.5s ease-in-out infinite;
+  flex-shrink:0;transition:background .25s}
+
+/* ════════════════════════════════════════════════════════
+   PET AREA
+   ════════════════════════════════════════════════════════ */
+#pet-area{background:var(--sapBaseColor);padding:14px 0 8px;text-align:center;
+  border-bottom:1px solid var(--sapList_BorderColor);
+  flex-shrink:0;position:relative;overflow:hidden;transition:background .25s}
+#pet-area::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.016) 2px,rgba(255,255,255,.016) 4px)}
+#pet-wrap{display:inline-block;animation:floatAnim 3.4s ease-in-out infinite}
+#pet-status{font-family:var(--sapFontFamily);font-size:.625rem;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--sapHighlightColor);margin-top:4px;transition:color .25s}
+#collapse-expand{display:none;justify-content:center;margin-top:4px}
+#btn-expand{background:none;border:none;color:var(--sapHighlightColor);
+  font-size:.625rem;font-family:var(--sapFontFamily);
+  cursor:pointer;letter-spacing:.1em;font-weight:700;opacity:.8;transition:opacity .15s}
+#btn-expand:hover{opacity:1}
+.bapi-eye{animation:blinkEye 4.2s ease-in-out infinite;
+  transform-box:fill-box;transform-origin:center}
+#eye-r{animation-delay:.22s}
+#ant-dot{animation:sapGlow 2.5s ease-in-out infinite}
+
+/* ════════════════════════════════════════════════════════
+   PILLS — SAP Token/Tag bar
+   ════════════════════════════════════════════════════════ */
+#pills-wrap{background:var(--sapBaseColor);
+  border-bottom:1px solid var(--sapList_BorderColor);flex-shrink:0;
+  transition:background .25s}
+#pills{display:flex;flex-wrap:wrap;gap:4px;padding:6px 10px;max-height:68px;overflow-y:auto}
+.pill{font-family:var(--sapFontFamily);font-size:.75rem;padding:2px 10px;
+  border-radius:var(--sapButton_BorderRadius);
+  background:var(--sapButton_Background);color:var(--sapButton_TextColor);
+  border:1px solid var(--sapButton_BorderColor);cursor:pointer;white-space:nowrap;
+  transition:background .15s,border-color .15s,color .15s;line-height:1.6}
+.pill:hover,.pill.active{background:var(--sapButton_Emphasized_Background);
+  color:var(--sapButton_Emphasized_TextColor);border-color:var(--sapButton_Emphasized_BorderColor)}
+
+/* ════════════════════════════════════════════════════════
+   CHAT — SAP Message Stream
+   ════════════════════════════════════════════════════════ */
+#chat-area{flex:1;overflow-y:auto;padding:10px 12px;
+  display:flex;flex-direction:column;gap:8px;
+  background:var(--sapBackgroundColor);scroll-behavior:smooth;transition:background .25s}
+.msg{padding:8px 12px;border-radius:var(--sapContent_BorderRadius);
+  font-family:var(--sapFontFamily);font-size:.8125rem;line-height:1.65;
+  word-break:break-word;max-width:92%;
+  animation:fadeSlide .18s ease-out;position:relative;border:1px solid transparent}
+.msg-bapi{align-self:flex-start;background:var(--_msg_bapi_bg);
+  color:var(--sapTextColor);border-color:var(--sapList_BorderColor);
+  border-left:3px solid var(--_msg_accent_border);margin-right:8%}
+.msg-user{align-self:flex-end;background:var(--_msg_user_bg);
+  color:var(--sapTextColor);border-color:var(--sapList_BorderColor);margin-left:8%}
+.msg-thinking{opacity:.5;font-style:italic}
+.msg-expand-btn{position:absolute;bottom:4px;right:5px;background:none;border:none;
+  color:var(--sapContent_LabelColor);font-family:"SAP-icons";font-size:.75rem;
+  cursor:pointer;opacity:0;transition:opacity .15s;line-height:1;padding:2px}
+.msg:hover .msg-expand-btn{opacity:.8}
+.msg-expand-btn:hover{color:var(--sapHighlightColor);opacity:1!important}
+
+/* ════════════════════════════════════════════════════════
+   INPUT BAR — SAP Footer Toolbar
+   ════════════════════════════════════════════════════════ */
+#input-bar{padding:8px 12px;border-top:1px solid var(--sapList_BorderColor);
+  background:var(--sapBaseColor);display:flex;gap:8px;flex-shrink:0;align-items:center;
+  transition:background .25s}
+#user-input{flex:1;background:var(--sapField_Background);
+  border:1px solid var(--sapField_BorderColor);border-radius:var(--sapField_BorderRadius);
+  color:var(--sapField_TextColor);font-family:var(--sapFontFamily);font-size:.8125rem;
+  padding:6px 10px;outline:none;transition:border-color .15s,box-shadow .15s}
+#user-input:focus{border-color:var(--sapField_HoverBorderColor);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--sapHighlightColor) 22%,transparent)}
+#user-input::placeholder{color:var(--sapField_PlaceholderTextColor)}
+#send-btn{background:var(--sapButton_Emphasized_Background);
+  color:var(--sapButton_Emphasized_TextColor);
+  border:1px solid var(--sapButton_Emphasized_BorderColor);
+  border-radius:var(--sapButton_BorderRadius);
+  width:34px;height:34px;font-family:"SAP-icons";font-size:1rem;
+  cursor:pointer;transition:opacity .15s,transform .1s;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#send-btn:hover{opacity:.88}#send-btn:active{transform:scale(.96)}
+#send-btn:disabled{opacity:.38;cursor:default}
+
+/* ════════════════════════════════════════════════════════
+   SETTINGS OVERLAY — SAP Dialog
+   ════════════════════════════════════════════════════════ */
+#settings-overlay{position:absolute;inset:0;background:var(--sapBackgroundColor);
+  border-radius:var(--sapContent_BorderRadius);
+  display:flex;flex-direction:column;z-index:100;overflow:hidden}
+#settings-overlay.hidden{display:none}
+#settings-header{background:var(--sapShellColor);border-bottom:1px solid var(--sapShell_BorderColor);
+  padding:0 14px;height:44px;display:flex;align-items:center;gap:8px;
+  flex-shrink:0;transition:background .25s}
+#settings-header-title{font-family:var(--sapFontFamily);font-size:.875rem;font-weight:700;
+  color:var(--sapShell_TextColor);flex:1;}
+#settings-back{background:none;border:none;color:var(--sapShell_TextColor);
+  font-family:"SAP-icons";font-size:1rem;cursor:pointer;width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s;opacity:.85}
+#settings-back:hover{background:rgba(255,255,255,.14);opacity:1}
+#settings-body{flex:1;padding:14px 14px 8px;overflow-y:auto;
+  background:var(--sapBackgroundColor);transition:background .25s}
+
+.s-label{font-family:var(--sapFontFamily);font-size:.6875rem;font-weight:700;
+  color:var(--sapContent_LabelColor);letter-spacing:.04em;
+  margin-bottom:5px;display:block;text-transform:uppercase}
+.s-input{width:100%;background:var(--sapField_Background);
+  border:1px solid var(--sapField_BorderColor);border-radius:var(--sapField_BorderRadius);
+  color:var(--sapField_TextColor);font-family:var(--sapFontFamily);
+  font-size:.8125rem;padding:7px 10px;outline:none;
+  transition:border-color .15s,box-shadow .15s}
+.s-input:focus{border-color:var(--sapField_HoverBorderColor);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--sapHighlightColor) 18%,transparent)}
+.s-input option{background:var(--sapField_Background);color:var(--sapField_TextColor)}
+.s-hint{font-size:.6875rem;color:var(--sapContent_LabelColor);margin-top:4px;line-height:1.5}
+.s-hint a{color:var(--sapHighlightColor);cursor:pointer;text-decoration:none}
+.s-hint a:hover{text-decoration:underline}
+.s-group{margin-bottom:14px}
+.s-divider{border:none;border-top:1px solid var(--sapList_BorderColor);margin:10px 0}
+.s-row{display:flex;align-items:center;justify-content:space-between;
+  padding:7px 0;border-bottom:1px solid var(--sapList_BorderColor)}
+.s-row-label{font-size:.8125rem;color:var(--sapTextColor);font-family:var(--sapFontFamily)}
+.s-row-sub{font-size:.6875rem;color:var(--sapContent_LabelColor);margin-top:1px}
+
+/* SAP Switch */
+.toggle{position:relative;width:38px;height:20px;background:var(--sapButton_Background);
+  border:1px solid var(--sapButton_BorderColor);
+  border-radius:10px;cursor:pointer;transition:background .2s,border-color .2s;flex-shrink:0}
+.toggle.on{background:var(--sapButton_Emphasized_Background);
+  border-color:var(--sapButton_Emphasized_BorderColor)}
+.toggle-thumb{position:absolute;top:2px;left:2px;width:14px;height:14px;
+  background:#fff;border-radius:50%;transition:transform .2s;
+  box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.toggle.on .toggle-thumb{transform:translateX(18px)}
+
+/* ════════════════════════════════════════════════════════
+   THEME PICKER  — SAP Tile / Visual Selector
+   Swatches are hardcoded colors (preview, not affected by theme)
+   ════════════════════════════════════════════════════════ */
+.theme-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:4px}
+.theme-swatch{aspect-ratio:1;cursor:pointer;border:2px solid transparent;
+  transition:border-color .15s,transform .12s;
+  display:flex;flex-direction:column;overflow:hidden;position:relative;
+  border-radius:4px}
+.theme-swatch:hover{transform:scale(1.07)}
+.theme-swatch.active{border-color:var(--sapHighlightColor)}
+/* Shell bar stripe */
+.sw-shell{height:36%;flex-shrink:0}
+/* Content body */
+.sw-body{flex:1;display:flex;align-items:flex-end;padding:2px 3px}
+/* Label */
+.sw-lbl{font-family:"72",Arial,sans-serif;font-size:6px;font-weight:700;
+  letter-spacing:.08em;line-height:1;padding:1px 0}
+
+/* Per-swatch hardcoded SAP colors */
+.ts-eve  {background:#1d2d3e} .ts-eve  .sw-shell{background:#1d2d3e;border-bottom:1px solid #354a5e} .ts-eve  .sw-lbl{color:#0070f2}
+.ts-qtz  {background:#1c2228} .ts-qtz  .sw-shell{background:#354a5e}                                  .ts-qtz  .sw-lbl{color:#0a6ed1}
+.ts-blz  {background:#213146} .ts-blz  .sw-shell{background:#213146;border-bottom:1px solid #5e81a0} .ts-blz  .sw-lbl{color:#427cac}
+.ts-hch  {background:#000;border-color:#fff!important} .ts-hch  .sw-shell{background:#000;border-bottom:1px solid #fff} .ts-hch  .sw-lbl{color:#00d9f5}
+.ts-hcq  {background:#000;border-color:#fff!important} .ts-hcq  .sw-shell{background:#000;border-bottom:1px solid #fff} .ts-hcq  .sw-lbl{color:#6fa8ff}
+
+/* Opacity slider */
+.opacity-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+#opacity-slider{flex:1;-webkit-appearance:none;appearance:none;
+  height:4px;border-radius:2px;background:var(--sapContent_ForegroundColor);
+  outline:none;cursor:pointer}
+#opacity-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;
+  border-radius:50%;background:var(--sapButton_Emphasized_Background);
+  border:1px solid var(--sapButton_Emphasized_BorderColor);
+  cursor:pointer;transition:transform .1s}
+#opacity-slider::-webkit-slider-thumb:hover{transform:scale(1.2)}
+#opacity-val{font-size:.6875rem;font-weight:700;color:var(--sapHighlightColor);
+  width:34px;text-align:right;flex-shrink:0}
+
+/* Reminders */
+#reminders-list{display:flex;flex-direction:column;gap:5px;margin-bottom:6px}
+.r-row{display:flex;align-items:center;gap:5px;
+  background:var(--sapGroup_ContentBackground);
+  border:1px solid var(--sapGroup_BorderColor);
+  border-radius:var(--sapElement_BorderRadius);padding:5px 7px}
+.r-enabled{flex-shrink:0;cursor:pointer}
+.r-emoji,.r-name,.r-time{background:var(--sapField_Background);
+  border:1px solid var(--sapField_BorderColor);
+  border-radius:var(--sapField_BorderRadius);
+  color:var(--sapField_TextColor);font-family:inherit;outline:none}
+.r-emoji:focus,.r-name:focus,.r-time:focus{border-color:var(--sapField_HoverBorderColor)}
+.r-emoji{width:27px;padding:3px 2px;font-size:.75rem;text-align:center;flex-shrink:0}
+.r-name{flex:1;padding:3px 6px;font-size:.6875rem;min-width:0}
+.r-time{width:80px;padding:3px 5px;font-size:.6875rem;text-align:center;flex-shrink:0}
+.r-del{background:none;border:none;color:var(--sapContent_LabelColor);
+  font-family:"SAP-icons";font-size:.75rem;cursor:pointer;line-height:1;
+  flex-shrink:0;padding:0 2px;transition:color .15s}
+.r-del:hover{color:var(--sapNegativeColor)}
+#add-reminder{width:100%;background:var(--sapButton_Background);
+  border:1px dashed var(--sapButton_BorderColor);
+  border-radius:var(--sapElement_BorderRadius);
+  color:var(--sapContent_LabelColor);font-family:var(--sapFontFamily);font-size:.75rem;
+  padding:6px;cursor:pointer;transition:color .15s,border-color .15s,background .15s;text-align:center}
+#add-reminder:hover{background:var(--sapButton_Hover_Background);
+  color:var(--sapHighlightColor);border-color:var(--sapHighlightColor)}
+#save-btn{width:100%;margin-top:10px;background:var(--sapButton_Emphasized_Background);
+  color:var(--sapButton_Emphasized_TextColor);
+  border:1px solid var(--sapButton_Emphasized_BorderColor);
+  border-radius:var(--sapButton_BorderRadius);font-family:var(--sapFontFamily);
+  font-size:.875rem;font-weight:700;padding:9px;cursor:pointer;
+  transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+#save-btn:hover{opacity:.88}
+#api-status{font-size:.6875rem;margin-top:4px;display:none}
+#model-hint{font-size:.6875rem;color:var(--sapContent_LabelColor);margin-top:4px}
+
+/* ════════════════════════════════════════════════════════
+   F4 VALUE HELP DIALOG — SAP Input Value Help
+   ════════════════════════════════════════════════════════ */
+#f4-overlay{position:absolute;inset:0;background:rgba(0,0,0,.65);
+  border-radius:var(--sapContent_BorderRadius);z-index:200;
+  display:flex;flex-direction:column;overflow:hidden}
+#f4-overlay.hidden{display:none}
+#f4-dialog{display:flex;flex-direction:column;flex:1;overflow:hidden;
+  background:var(--sapBackgroundColor)}
+#f4-header{background:var(--sapGroup_TitleBackground);
+  border-bottom:1px solid var(--sapGroup_BorderColor);
+  padding:0 14px;height:40px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+#f4-header-title{font-family:var(--sapFontFamily);font-size:.8125rem;font-weight:700;
+  color:var(--sapTextColor);flex:1}
+#f4-close{background:none;border:none;color:var(--sapTextColor);
+  font-family:"SAP-icons";font-size:.875rem;cursor:pointer;opacity:.7;
+  width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;transition:background .15s}
+#f4-close:hover{background:rgba(255,255,255,.12);opacity:1}
+#f4-toolbar{padding:7px 12px;background:var(--sapGroup_ContentBackground);
+  border-bottom:1px solid var(--sapList_BorderColor);flex-shrink:0}
+#f4-search{width:100%;background:var(--sapField_Background);
+  border:1px solid var(--sapField_BorderColor);border-radius:var(--sapField_BorderRadius);
+  color:var(--sapField_TextColor);font-family:var(--sapFontFamily);font-size:.75rem;
+  padding:5px 9px;outline:none;transition:border-color .15s}
+#f4-search:focus{border-color:var(--sapField_HoverBorderColor)}
+#f4-search::placeholder{color:var(--sapField_PlaceholderTextColor)}
+#f4-list{flex:1;overflow-y:auto;background:var(--sapList_Background)}
+.f4-state{padding:20px;text-align:center;color:var(--sapContent_LabelColor);font-size:.75rem}
+.f4-row{padding:8px 14px;cursor:pointer;border-bottom:1px solid var(--sapList_BorderColor);
+  display:flex;align-items:flex-start;gap:10px;transition:background .1s}
+.f4-row:hover{background:var(--sapList_HoverBackground)}
+.f4-row.selected{background:var(--sapList_SelectionBackgroundColor)}
+.f4-row-left{flex:1;min-width:0}
+.f4-model-name{font-size:.8125rem;color:var(--sapList_TextColor);
+  font-weight:600;font-family:var(--sapFontFamily)}
+.f4-model-id{font-size:.6875rem;color:var(--sapHighlightColor);margin-top:1px}
+.f4-model-desc{font-size:.6875rem;color:var(--sapContent_LabelColor);margin-top:2px;line-height:1.4}
+.f4-badge{font-size:.625rem;padding:1px 7px;border-radius:var(--sapButton_BorderRadius);
+  white-space:nowrap;flex-shrink:0;margin-top:2px;
+  background:var(--sapButton_Background);color:var(--sapContent_LabelColor);
+  border:1px solid var(--sapButton_BorderColor);font-family:var(--sapFontFamily)}
+.f4-badge.free{background:rgba(48,145,76,.15);color:var(--sapPositiveColor);
+  border-color:var(--sapPositiveColor)}
+#f4-footer{padding:6px 12px;background:var(--sapGroup_ContentBackground);
+  border-top:1px solid var(--sapList_BorderColor);
+  font-size:.625rem;color:var(--sapContent_LabelColor);
+  font-family:var(--sapFontFamily);flex-shrink:0;
+  display:flex;justify-content:space-between}
+
+
+/* ── Resize handle visual hint ── */
+#resize-hint{
+  position:absolute; bottom:0; right:0;
+  width:14px; height:14px;
+  cursor:se-resize;
+  opacity:.35; pointer-events:none;
+  background:linear-gradient(135deg,transparent 40%,var(--sapContent_ForegroundBorderColor) 40%,transparent 60%,var(--sapContent_ForegroundBorderColor) 60%,transparent 80%,var(--sapContent_ForegroundBorderColor) 80%,transparent);
+}
+#app:hover #resize-hint{opacity:.6}
+
+/* ════ KEYFRAMES ════ */
+@keyframes floatAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes bounceAnim{0%,100%{transform:translateY(0)}35%{transform:translateY(-12px)}65%{transform:translateY(-5px)}}
+@keyframes blinkEye{0%,88%,100%{transform:scaleY(1)}93%{transform:scaleY(.07)}}
+@keyframes sapGlow{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes fastFlash{0%,100%{opacity:1}50%{opacity:.05}}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Shell Bar -->
+  <div id="titlebar">
+    <button class="tb-btn" id="btn-close"    title="Hide to tray"></button>
+    <button class="tb-btn" id="btn-minimize" title="Minimize"></button>
+    <button class="tb-btn" id="btn-hide"     title="Hide"></button>
+    <div id="tb-brand">
+      <div id="tb-logo"><span id="tb-logo-text">BAPI</span></div>
+      <span id="tb-product-name">BAPI — ABAP Companion</span>
+    </div>
+    <div id="tb-actions">
+      <button class="tb-icon-btn" id="tb-collapse" title="Collapse to pet mode">
+        <span class="si">&#xe1a9;</span>
+      </button>
+      <button class="tb-icon-btn" id="tb-gear" title="Settings">
+        <span class="si">&#xe031;</span>
+      </button>
+      <div id="tb-online-dot" title="Online"></div>
+    </div>
+  </div>
+
+  <!-- Pet -->
+  <div id="pet-area">
+    <div id="pet-wrap">
+      <svg viewBox="0 0 92 104" width="80" height="90" style="overflow:visible">
+        <ellipse cx="46" cy="100" rx="22" ry="3.5" fill="var(--sapHighlightColor)" opacity=".1"/>
+        <line x1="46" y1="15" x2="46" y2="3" stroke="var(--sapContent_ForegroundBorderColor)" stroke-width="1.8" stroke-linecap="round"/>
+        <circle id="ant-dot" cx="46" cy="2.5" r="3.8" fill="var(--sapHighlightColor)"/>
+        <rect x="9" y="15" width="74" height="66" rx="12" fill="var(--sapBaseColor)" stroke="var(--sapHighlightColor)" stroke-width="1.2"/>
+        <rect x="15" y="21" width="62" height="54" rx="9" fill="var(--sapBackgroundColor)" opacity=".6"/>
+        <rect id="eye-l" class="bapi-eye" x="21" y="34" width="19" height="19" rx="4" fill="var(--sapHighlightColor)" opacity=".95"/>
+        <rect x="26" y="39" width="6" height="6" rx="1.5" fill="var(--sapBackgroundColor)"/>
+        <rect id="eye-r" class="bapi-eye" x="52" y="34" width="19" height="19" rx="4" fill="var(--sapHighlightColor)" opacity=".95"/>
+        <rect x="57" y="39" width="6" height="6" rx="1.5" fill="var(--sapBackgroundColor)"/>
+        <path id="bapi-mouth" d="M27 62 Q46 75 65 62" fill="none" stroke="var(--sapHighlightColor)" stroke-width="2" stroke-linecap="round" opacity=".85"/>
+        <rect x="1"  y="35" width="9" height="5.5" rx="2.5" fill="var(--sapContent_ForegroundColor)" stroke="var(--sapContent_ForegroundBorderColor)" stroke-width=".5"/>
+        <rect x="1"  y="45" width="9" height="5.5" rx="2.5" fill="var(--sapContent_ForegroundColor)" stroke="var(--sapContent_ForegroundBorderColor)" stroke-width=".5"/>
+        <rect x="82" y="35" width="9" height="5.5" rx="2.5" fill="var(--sapContent_ForegroundColor)" stroke="var(--sapContent_ForegroundBorderColor)" stroke-width=".5"/>
+        <circle cx="26" cy="81" r="2.8" fill="var(--sapPositiveColor)" opacity=".7"/>
+        <circle cx="36" cy="81" r="2.8" fill="var(--sapCriticalColor)" opacity=".35"/>
+        <circle cx="46" cy="81" r="2.8" fill="var(--sapContent_ForegroundColor)"/>
+        <rect x="24" y="81" width="15" height="15" rx="7.5" fill="var(--sapContent_ForegroundColor)" stroke="var(--sapContent_ForegroundBorderColor)" stroke-width=".5"/>
+        <rect x="53" y="81" width="15" height="15" rx="7.5" fill="var(--sapContent_ForegroundColor)" stroke="var(--sapContent_ForegroundBorderColor)" stroke-width=".5"/>
+      </svg>
+    </div>
+    <div id="pet-status">READY</div>
+    <div id="collapse-expand"><button id="btn-expand">▲ OPEN CHAT</button></div>
+  </div>
+
+  <!-- Pills -->
+  <div id="pills-wrap"><div id="pills"></div></div>
+
+  <!-- Chat -->
+  <div id="chat-area"></div>
+
+  <!-- Input Bar -->
+  <div id="input-bar">
+    <input id="user-input" type="text" placeholder="Ask BAPI…" autocomplete="off" spellcheck="false">
+    <button id="send-btn" title="Send (Enter)"><span class="si">&#xe044;</span></button>
+  </div>
+
+  <!-- ══ Settings ══ -->
+  <div id="settings-overlay" class="hidden">
+    <div id="settings-header">
+      <span class="si" style="color:var(--sapShell_TextColor);font-size:1rem;flex-shrink:0">&#xe031;</span>
+      <span id="settings-header-title">Settings</span>
+      <button id="settings-back" title="Close"><span class="si">&#xe05b;</span></button>
+    </div>
+    <div id="settings-body">
+
+      <div class="s-group">
+        <label class="s-label">AI Provider</label>
+        <select class="s-input" id="inp-provider" style="cursor:pointer">
+          <option value="anthropic">Anthropic — Claude</option>
+          <option value="google">Google — Gemini / Gemma</option>
+        </select>
+      </div>
+
+      <div class="s-group">
+        <label class="s-label">API Key</label>
+        <input class="s-input" id="inp-apikey" type="password" placeholder="Paste your key here…" spellcheck="false" autocomplete="off">
+        <div class="s-hint">Anthropic: <a id="link-console">console.anthropic.com</a> &nbsp;·&nbsp; Google: <a id="link-google">aistudio.google.com</a></div>
+        <div id="api-status"></div>
+      </div>
+
+      <div class="s-group">
+        <label class="s-label">Model</label>
+        <div style="display:flex;gap:6px">
+          <input class="s-input" id="inp-model" type="text" placeholder="" spellcheck="false" style="flex:1">
+          <button id="btn-f4" title="Value Help (F4)"
+            style="background:var(--sapButton_Emphasized_Background);color:var(--sapButton_Emphasized_TextColor);
+              border:1px solid var(--sapButton_Emphasized_BorderColor);
+              border-radius:var(--sapButton_BorderRadius);font-family:var(--sapFontFamily);
+              font-size:.75rem;font-weight:700;padding:0 12px;cursor:pointer;
+              white-space:nowrap;flex-shrink:0;height:34px;transition:opacity .15s">F4</button>
+        </div>
+        <div id="model-hint"></div>
+      </div>
+
+      <hr class="s-divider">
+
+      <!-- SAP Theme selector — 5 visual tiles -->
+      <div class="s-group">
+        <label class="s-label">SAP Theme</label>
+        <div class="theme-grid">
+          <div class="theme-swatch ts-eve" data-theme="sap_horizon_dark" title="Evening Horizon — S/4HANA 2022+">
+            <div class="sw-shell"></div>
+            <div class="sw-body"><span class="sw-lbl" style="color:#0070f2">EVE</span></div>
+          </div>
+          <div class="theme-swatch ts-qtz" data-theme="sap_fiori_3_dark" title="Quartz Dark — SAP Fiori 3">
+            <div class="sw-shell"></div>
+            <div class="sw-body"><span class="sw-lbl" style="color:#0a6ed1">QTZ</span></div>
+          </div>
+          <div class="theme-swatch ts-blz" data-theme="sap_belize_deep" title="Belize Deep — SAP Fiori 2 · flat corners">
+            <div class="sw-shell"></div>
+            <div class="sw-body"><span class="sw-lbl" style="color:#427cac">BLZ</span></div>
+          </div>
+          <div class="theme-swatch ts-hch" data-theme="sap_horizon_hcb" title="High Contrast Black — Horizon">
+            <div class="sw-shell"></div>
+            <div class="sw-body"><span class="sw-lbl" style="color:#00d9f5">HCH</span></div>
+          </div>
+          <div class="theme-swatch ts-hcq" data-theme="sap_fiori_3_hcb" title="High Contrast Black — Quartz · flat corners">
+            <div class="sw-shell"></div>
+            <div class="sw-body"><span class="sw-lbl" style="color:#6fa8ff">HCQ</span></div>
+          </div>
+        </div>
+        <div style="margin-top:5px;font-size:.6rem;color:var(--sapContent_LabelColor);line-height:1.6">
+          <b style="color:var(--sapTextColor)">EVE</b> Evening Horizon (S/4HANA 2022+) &nbsp;
+          <b style="color:var(--sapTextColor)">QTZ</b> Quartz Dark (Fiori 3) &nbsp;
+          <b style="color:var(--sapTextColor)">BLZ</b> Belize Deep (Fiori 2, flat) &nbsp;
+          <b style="color:var(--sapTextColor)">HCH/HCQ</b> High Contrast Black
+        </div>
+      </div>
+
+      <div class="s-group">
+        <label class="s-label">Window Opacity</label>
+        <div class="opacity-row">
+          <span style="font-size:.6875rem;color:var(--sapContent_LabelColor)">15%</span>
+          <input type="range" id="opacity-slider" min="15" max="100" step="5" value="100">
+          <span style="font-size:.6875rem;color:var(--sapContent_LabelColor)">100%</span>
+          <span id="opacity-val">100%</span>
+        </div>
+      </div>
+
+      <hr class="s-divider">
+
+      <div class="s-group">
+        <label class="s-label">
+          <span class="si" style="font-size:.75rem;margin-right:4px">&#xe05d;</span>
+          Reminders — Mon–Fri · WIB (UTC+7)
+        </label>
+        <div id="reminders-list"></div>
+        <button id="add-reminder">
+          <span class="si" style="font-size:.75rem;margin-right:4px">&#xe043;</span>
+          Add Reminder
+        </button>
+      </div>
+
+      <hr class="s-divider">
+
+      <div class="s-group">
+        <div class="s-row">
+          <div>
+            <div class="s-row-label">Reminders enabled</div>
+            <div class="s-row-sub">Auto-fire at scheduled times</div>
+          </div>
+          <div class="toggle" id="toggle-reminders"><div class="toggle-thumb"></div></div>
+        </div>
+        <div class="s-row" style="border-bottom:none">
+          <div><div class="s-row-label">Launch on Windows startup</div></div>
+          <div class="toggle" id="toggle-login"><div class="toggle-thumb"></div></div>
+        </div>
+      </div>
+
+      <button id="save-btn">
+        <span class="si" style="font-size:.875rem">&#xe064;</span>
+        Save Settings
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ══ F4 Value Help ══ -->
+  <div id="f4-overlay" class="hidden">
+    <div id="f4-dialog">
+      <div id="f4-header">
+        <span class="si" style="color:var(--sapHighlightColor);font-size:.875rem;flex-shrink:0">&#xe03b;</span>
+        <span id="f4-header-title">Model — Value Help (F4)</span>
+        <button id="f4-close"><span class="si">&#xe05b;</span></button>
+      </div>
+      <div id="f4-toolbar">
+        <input id="f4-search" type="text" placeholder="Search models…" autocomplete="off">
+      </div>
+      <div id="f4-list"><div class="f4-state">Fetching model list from Google…</div></div>
+      <div id="f4-footer">
+        <span>Click row to select · ESC to close</span>
+        <span id="f4-count"></span>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div id="resize-hint"></div>
+<script src="renderer.js"></script>
+</body>
+</html>

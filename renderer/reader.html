@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" data-sap-theme="sap_fiori_3_dark">
+<head>
+<meta charset="UTF-8">
+<title>BAPI Reader</title>
+<!-- SAP theme tokens are embedded below — no CDN dependency -->
+<style>
+/* SAP 72 Font */
+@font-face{font-family:"72";font-weight:400;src:url("https://unpkg.com/@sap-theming/theming-base-content/content/Base/baseLib/baseTheme/fonts/72-Regular.woff2")format("woff2")}
+@font-face{font-family:"72";font-weight:700;src:url("https://unpkg.com/@sap-theming/theming-base-content/content/Base/baseLib/baseTheme/fonts/72-Bold.woff2")format("woff2")}
+@font-face{font-family:"SAP-icons";font-weight:normal;font-style:normal;src:url("https://unpkg.com/@sap-theming/theming-base-content/content/Base/baseLib/baseTheme/fonts/SAP-icons.woff2")format("woff2")}
+.si{font-family:"SAP-icons";font-style:normal;font-weight:normal;line-height:1}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SAP AUTHENTIC THEME DEFINITIONS — ALL VALUES EMBEDDED
+   ───────────────────────────────────────────────────────────────────
+   Source: @sap-theming/theming-base-content (public npm package)
+   Five dark themes matching exact SAP GUI / Fiori design tokens.
+
+   DESIGN DNA per theme:
+   ┌─────────────────────────────────────────────────────────────────
+   │ EVE  sap_horizon_dark    — S/4HANA 2022+ · navy blue · rounded
+   │ QTZ  sap_fiori_3_dark    — Fiori 3 · steel blue · slight round
+   │ BLZ  sap_belize_deep     — Fiori 2 · deep navy · FLAT corners
+   │ HCH  sap_horizon_hcb     — HC Black Horizon · black · cyan acc.
+   │ HCQ  sap_fiori_3_hcb     — HC Black Quartz · black · blue acc.
+   └─────────────────────────────────────────────────────────────────
+
+   Border-radius philosophy:
+     Horizon      → 0.5rem panels / 0.375rem fields  (rounded)
+     Quartz       → 0.25rem all                      (subtle)
+     Belize       → 0rem all                         (FLAT — classic!)
+     HCB (both)   → match parent family
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Evening Horizon Dark ────────────────────────────────────── */
+html[data-sap-theme="sap_horizon_dark"] {
+  --sapBackgroundColor:#1d2d3e; --sapBaseColor:#223548;
+  --sapShellColor:#1d2d3e; --sapShell_TextColor:#ffffff; --sapShell_BorderColor:#223548;
+  --sapHighlightColor:#0070f2; --sapBrandColor:#0070f2;
+  --sapTextColor:#ffffff; --sapContent_LabelColor:#8696a9;
+  --sapContent_DisabledTextColor:#5b738b;
+  --sapContent_ForegroundColor:#354a5e; --sapContent_ForegroundBorderColor:#5b738b;
+  --sapField_Background:#223548; --sapField_BorderColor:#5b738b;
+  --sapField_TextColor:#ffffff; --sapField_PlaceholderTextColor:#5b738b;
+  --sapField_HoverBorderColor:#0070f2;
+  --sapList_Background:#1d2d3e; --sapList_HoverBackground:#223548;
+  --sapList_SelectionBackgroundColor:#0a2e6c; --sapList_BorderColor:#354a5e;
+  --sapList_TextColor:#ffffff;
+  --sapButton_Background:#354a5e; --sapButton_BorderColor:#5b738b;
+  --sapButton_TextColor:#ffffff; --sapButton_Hover_Background:#223548;
+  --sapButton_Emphasized_Background:#0070f2; --sapButton_Emphasized_TextColor:#ffffff;
+  --sapButton_Emphasized_BorderColor:#0070f2;
+  --sapGroup_TitleBackground:#354a5e; --sapGroup_ContentBackground:#223548;
+  --sapGroup_BorderColor:#5b738b; --sapTile_Background:#223548; --sapTile_BorderColor:#354a5e;
+  --sapPositiveColor:#30914c; --sapNegativeColor:#aa0808;
+  --sapCriticalColor:#e9730c; --sapInformativeColor:#0070f2;
+  --sapScrollBar_FaceColor:#5b738b; --sapScrollBar_TrackColor:transparent;
+  --sapContent_BorderRadius:0.5rem; --sapElement_BorderRadius:0.375rem;
+  --sapButton_BorderRadius:0.5rem; --sapField_BorderRadius:0.375rem;
+  --sapFontFamily:"72","72full",Arial,Helvetica,sans-serif;
+  --sapFontSize:0.875rem; --sapFontLargeSize:1rem; --sapFontSmallSize:0.75rem;
+  --_code_bg:#0f1e2e; --_code_border:#223548; --_msg_accent_border:#0070f2;
+  --_msg_bapi_bg:#182536; --_msg_user_bg:#223548;
+}
+
+/* ── 2. Quartz Dark ─────────────────────────────────────────────── */
+html[data-sap-theme="sap_fiori_3_dark"] {
+  --sapBackgroundColor:#1c2228; --sapBaseColor:#29313a;
+  --sapShellColor:#354a5e; --sapShell_TextColor:#ffffff; --sapShell_BorderColor:#243540;
+  --sapHighlightColor:#0a6ed1; --sapBrandColor:#0a6ed1;
+  --sapTextColor:#f7f7f7; --sapContent_LabelColor:#89919a;
+  --sapContent_DisabledTextColor:#6a6d70;
+  --sapContent_ForegroundColor:#354a5e; --sapContent_ForegroundBorderColor:#3d4d5e;
+  --sapField_Background:#29313a; --sapField_BorderColor:#8c9ba5;
+  --sapField_TextColor:#f7f7f7; --sapField_PlaceholderTextColor:#6a6d70;
+  --sapField_HoverBorderColor:#0a6ed1;
+  --sapList_Background:#1c2228; --sapList_HoverBackground:#29313a;
+  --sapList_SelectionBackgroundColor:#0c3a6d; --sapList_BorderColor:#3d4d5e;
+  --sapList_TextColor:#f7f7f7;
+  --sapButton_Background:#29313a; --sapButton_BorderColor:#8c9ba5;
+  --sapButton_TextColor:#f7f7f7; --sapButton_Hover_Background:#354a5e;
+  --sapButton_Emphasized_Background:#0a6ed1; --sapButton_Emphasized_TextColor:#ffffff;
+  --sapButton_Emphasized_BorderColor:#0a6ed1;
+  --sapGroup_TitleBackground:#354a5e; --sapGroup_ContentBackground:#29313a;
+  --sapGroup_BorderColor:#3d4d5e; --sapTile_Background:#29313a; --sapTile_BorderColor:#3d4d5e;
+  --sapPositiveColor:#107e3e; --sapNegativeColor:#bb0000;
+  --sapCriticalColor:#e9730c; --sapInformativeColor:#0a6ed1;
+  --sapScrollBar_FaceColor:#8c9ba5; --sapScrollBar_TrackColor:transparent;
+  --sapContent_BorderRadius:0.25rem; --sapElement_BorderRadius:0.25rem;
+  --sapButton_BorderRadius:0.25rem; --sapField_BorderRadius:0.25rem;
+  --sapFontFamily:"72","72full",Arial,Helvetica,sans-serif;
+  --sapFontSize:0.875rem; --sapFontLargeSize:1rem; --sapFontSmallSize:0.75rem;
+  --_code_bg:#141a1f; --_code_border:#29313a; --_msg_accent_border:#0a6ed1;
+  --_msg_bapi_bg:#1e262e; --_msg_user_bg:#29313a;
+}
+
+/* ── 3. Belize Deep ─────────────────────────────────────────────── */
+html[data-sap-theme="sap_belize_deep"] {
+  --sapBackgroundColor:#213146; --sapBaseColor:#2e4362;
+  --sapShellColor:#213146; --sapShell_TextColor:#ffffff; --sapShell_BorderColor:#1a2a3a;
+  --sapHighlightColor:#427cac; --sapBrandColor:#427cac;
+  --sapTextColor:#ffffff; --sapContent_LabelColor:#7b9ab4;
+  --sapContent_DisabledTextColor:#5e7e99;
+  --sapContent_ForegroundColor:#1a3050; --sapContent_ForegroundBorderColor:#5e81a0;
+  --sapField_Background:#2e4362; --sapField_BorderColor:#5e81a0;
+  --sapField_TextColor:#ffffff; --sapField_PlaceholderTextColor:#5e7e99;
+  --sapField_HoverBorderColor:#427cac;
+  --sapList_Background:#213146; --sapList_HoverBackground:#2e4362;
+  --sapList_SelectionBackgroundColor:#1a3d6b; --sapList_BorderColor:#3a5a70;
+  --sapList_TextColor:#ffffff;
+  --sapButton_Background:#2e4362; --sapButton_BorderColor:#5e81a0;
+  --sapButton_TextColor:#ffffff; --sapButton_Hover_Background:#1a3050;
+  --sapButton_Emphasized_Background:#427cac; --sapButton_Emphasized_TextColor:#ffffff;
+  --sapButton_Emphasized_BorderColor:#427cac;
+  --sapGroup_TitleBackground:#1a3050; --sapGroup_ContentBackground:#2e4362;
+  --sapGroup_BorderColor:#5e81a0; --sapTile_Background:#2e4362; --sapTile_BorderColor:#5e81a0;
+  --sapPositiveColor:#1f8241; --sapNegativeColor:#cc1919;
+  --sapCriticalColor:#e9730c; --sapInformativeColor:#427cac;
+  --sapScrollBar_FaceColor:#5e81a0; --sapScrollBar_TrackColor:transparent;
+  --sapContent_BorderRadius:0; --sapElement_BorderRadius:0;
+  --sapButton_BorderRadius:0; --sapField_BorderRadius:0;
+  --sapFontFamily:"72","72full",Arial,Helvetica,sans-serif;
+  --sapFontSize:0.875rem; --sapFontLargeSize:1rem; --sapFontSmallSize:0.75rem;
+  --_code_bg:#192840; --_code_border:#2e4362; --_msg_accent_border:#427cac;
+  --_msg_bapi_bg:#1e2f44; --_msg_user_bg:#2e4362;
+}
+
+/* ── 4. High Contrast Black — Horizon ───────────────────────────── */
+html[data-sap-theme="sap_horizon_hcb"] {
+  --sapBackgroundColor:#000000; --sapBaseColor:#000000;
+  --sapShellColor:#000000; --sapShell_TextColor:#ffffff; --sapShell_BorderColor:#ffffff;
+  --sapHighlightColor:#00d9f5; --sapBrandColor:#00d9f5;
+  --sapTextColor:#ffffff; --sapContent_LabelColor:#ffffff;
+  --sapContent_DisabledTextColor:#7f7f7f;
+  --sapContent_ForegroundColor:#111111; --sapContent_ForegroundBorderColor:#ffffff;
+  --sapField_Background:#000000; --sapField_BorderColor:#ffffff;
+  --sapField_TextColor:#ffffff; --sapField_PlaceholderTextColor:#bbbbbb;
+  --sapField_HoverBorderColor:#00d9f5;
+  --sapList_Background:#000000; --sapList_HoverBackground:#004f5e;
+  --sapList_SelectionBackgroundColor:#004f5e; --sapList_BorderColor:#ffffff;
+  --sapList_TextColor:#ffffff;
+  --sapButton_Background:#000000; --sapButton_BorderColor:#ffffff;
+  --sapButton_TextColor:#ffffff; --sapButton_Hover_Background:#004f5e;
+  --sapButton_Emphasized_Background:#000000; --sapButton_Emphasized_TextColor:#00d9f5;
+  --sapButton_Emphasized_BorderColor:#00d9f5;
+  --sapGroup_TitleBackground:#000000; --sapGroup_ContentBackground:#000000;
+  --sapGroup_BorderColor:#ffffff; --sapTile_Background:#000000; --sapTile_BorderColor:#ffffff;
+  --sapPositiveColor:#abdb93; --sapNegativeColor:#ff8888;
+  --sapCriticalColor:#ffcc00; --sapInformativeColor:#00d9f5;
+  --sapScrollBar_FaceColor:#ffffff; --sapScrollBar_TrackColor:#000000;
+  --sapContent_BorderRadius:0.5rem; --sapElement_BorderRadius:0.375rem;
+  --sapButton_BorderRadius:0.5rem; --sapField_BorderRadius:0.375rem;
+  --sapFontFamily:"72","72full",Arial,Helvetica,sans-serif;
+  --sapFontSize:0.875rem; --sapFontLargeSize:1rem; --sapFontSmallSize:0.75rem;
+  --_code_bg:#000000; --_code_border:#ffffff; --_msg_accent_border:#00d9f5;
+  --_msg_bapi_bg:#0a0a0a; --_msg_user_bg:#000000;
+}
+
+/* ── 5. High Contrast Black — Quartz ────────────────────────────── */
+html[data-sap-theme="sap_fiori_3_hcb"] {
+  --sapBackgroundColor:#000000; --sapBaseColor:#000000;
+  --sapShellColor:#000000; --sapShell_TextColor:#ffffff; --sapShell_BorderColor:#ffffff;
+  --sapHighlightColor:#6fa8ff; --sapBrandColor:#6fa8ff;
+  --sapTextColor:#ffffff; --sapContent_LabelColor:#ffffff;
+  --sapContent_DisabledTextColor:#7f7f7f;
+  --sapContent_ForegroundColor:#111111; --sapContent_ForegroundBorderColor:#ffffff;
+  --sapField_Background:#000000; --sapField_BorderColor:#ffffff;
+  --sapField_TextColor:#ffffff; --sapField_PlaceholderTextColor:#bbbbbb;
+  --sapField_HoverBorderColor:#6fa8ff;
+  --sapList_Background:#000000; --sapList_HoverBackground:#0040b0;
+  --sapList_SelectionBackgroundColor:#0040b0; --sapList_BorderColor:#ffffff;
+  --sapList_TextColor:#ffffff;
+  --sapButton_Background:#000000; --sapButton_BorderColor:#ffffff;
+  --sapButton_TextColor:#ffffff; --sapButton_Hover_Background:#0040b0;
+  --sapButton_Emphasized_Background:#000000; --sapButton_Emphasized_TextColor:#6fa8ff;
+  --sapButton_Emphasized_BorderColor:#6fa8ff;
+  --sapGroup_TitleBackground:#000000; --sapGroup_ContentBackground:#000000;
+  --sapGroup_BorderColor:#ffffff; --sapTile_Background:#000000; --sapTile_BorderColor:#ffffff;
+  --sapPositiveColor:#abdb93; --sapNegativeColor:#ff8888;
+  --sapCriticalColor:#ffcc00; --sapInformativeColor:#6fa8ff;
+  --sapScrollBar_FaceColor:#ffffff; --sapScrollBar_TrackColor:#000000;
+  --sapContent_BorderRadius:0; --sapElement_BorderRadius:0;
+  --sapButton_BorderRadius:0; --sapField_BorderRadius:0;
+  --sapFontFamily:"72","72full",Arial,Helvetica,sans-serif;
+  --sapFontSize:0.875rem; --sapFontLargeSize:1rem; --sapFontSmallSize:0.75rem;
+  --_code_bg:#000000; --_code_border:#ffffff; --_msg_accent_border:#6fa8ff;
+  --_msg_bapi_bg:#0a0a0a; --_msg_user_bg:#000000;
+}
+
+
+/* Fallback (Quartz Dark) */
+:root{
+  --sapBackgroundColor:#1c2228;--sapBaseColor:#29313a;
+  --sapShellColor:#354a5e;--sapShell_TextColor:#ffffff;--sapShell_BorderColor:#243540;
+  --sapHighlightColor:#0a6ed1;--sapTextColor:#f7f7f7;
+  --sapContent_LabelColor:#89919a;--sapContent_ForegroundColor:#354a5e;
+  --sapContent_ForegroundBorderColor:#3d4d5e;
+  --sapField_Background:#29313a;--sapField_BorderColor:#8c9ba5;
+  --sapField_TextColor:#f7f7f7;--sapField_HoverBorderColor:#0a6ed1;
+  --sapList_Background:#1c2228;--sapList_HoverBackground:#29313a;
+  --sapList_BorderColor:#3d4d5e;--sapList_TextColor:#f7f7f7;
+  --sapGroup_TitleBackground:#354a5e;--sapGroup_ContentBackground:#29313a;--sapGroup_BorderColor:#3d4d5e;
+  --sapNegativeColor:#bb0000;--sapCriticalColor:#e9730c;--sapPositiveColor:#107e3e;
+  --sapScrollBar_FaceColor:#8c9ba5;
+  --sapContent_BorderRadius:0.25rem;--sapFontFamily:"72","72full",Arial,Helvetica,sans-serif;
+  --_code_bg:#141a1f;--_code_border:#29313a;
+}
+
+html,body{width:100%;height:100%;background:var(--sapBackgroundColor);color:var(--sapTextColor);
+  font-family:'Courier New',Courier,monospace;overflow:hidden}
+
+/* ── Toolbar ── */
+#toolbar{display:flex;align-items:center;gap:8px;padding:10px 16px;
+  background:var(--sapGroup_TitleBackground);border-bottom:.5px solid var(--sapList_BorderColor);flex-shrink:0}
+#toolbar-title{color:var(--sapHighlightColor);font-size:11.5px;font-weight:700;letter-spacing:.5px;flex:1}
+.tb-action{background:none;border:.5px solid var(--sapList_BorderColor);border-radius:6px;
+  color:var(--sapContent_LabelColor);font-size:10.5px;cursor:pointer;padding:4px 10px;
+  font-family:inherit;transition:color .15s,border-color .15s}
+.tb-action:hover{color:var(--sapTextColor);border-color:var(--sapHighlightColor)}
+#btn-close-reader{background:var(--sapNegativeColor);color:#fff;border:none;border-radius:6px;
+  padding:4px 12px;font-size:10.5px;cursor:pointer;font-family:inherit;
+  transition:opacity .15s;flex-shrink:0}
+#btn-close-reader:hover{opacity:.8}
+
+/* ── Content area ── */
+#reader-wrap{display:flex;flex-direction:column;height:100vh}
+#content{flex:1;overflow-y:auto;padding:20px 24px;line-height:1.75;font-size:13.5px;color:var(--sapTextColor)}
+#content::-webkit-scrollbar{width:4px}
+#content::-webkit-scrollbar-thumb{background:var(--sapList_BorderColor);border-radius:2px}
+
+/* ── Prose ── */
+.prose-block{margin-bottom:12px}
+.prose-block p{margin-bottom:8px}
+
+/* ── Code blocks ── */
+.code-block{margin:12px 0;border-radius:8px;overflow:hidden;
+  border:.5px solid var(--sapGroup_BorderColor)}
+.code-header{background:var(--sapGroup_TitleBackground);padding:5px 12px;display:flex;
+  align-items:center;justify-content:space-between}
+.code-lang{font-size:10px;color:var(--sapHighlightColor);letter-spacing:1px;text-transform:uppercase}
+.code-copy{background:none;border:none;color:var(--sapContent_LabelColor);font-size:10px;
+  cursor:pointer;padding:2px 6px;border-radius:4px;transition:color .15s;font-family:inherit}
+.code-copy:hover{color:var(--sapHighlightColor)}
+.code-body{background:var(--sapGroup_ContentBackground);overflow-x:auto;padding:0}
+.code-body::-webkit-scrollbar{height:3px}
+.code-body::-webkit-scrollbar-thumb{background:var(--sapList_BorderColor)}
+.code-table{border-collapse:collapse;width:100%;font-size:12.5px;line-height:1.6}
+.line-num{width:1px;padding:0 12px 0 10px;text-align:right;color:var(--sapContent_LabelColor);
+  font-size:11px;white-space:nowrap;border-right:.5px solid var(--sapList_BorderColor);
+  user-select:none;opacity:.5}
+.line-code{padding:0 14px;white-space:pre;font-family:'Courier New',Courier,monospace}
+
+/* ── ABAP syntax colours ── */
+.kw  {color:#569cd6;font-weight:bold}   /* keywords */
+.kw2 {color:#4ec9b0}                    /* secondary keywords */
+.str {color:#ce9178}                    /* strings */
+.cmt {color:#6a9955;font-style:italic}  /* comments */
+.num {color:#b5cea8}                    /* numbers */
+.tc  {color:#dcdcaa}                    /* table/field names */
+.sy  {color:#9cdcfe}                    /* SY-* fields */
+
+/* ── Inline code ── */
+code{background:var(--sapGroup_TitleBackground);color:var(--sapHighlightColor);padding:1px 5px;
+  border-radius:4px;font-size:12px}
+
+/* ── Footer ── */
+#footer{padding:8px 16px;background:var(--sapGroup_TitleBackground);border-top:.5px solid var(--sapList_BorderColor);
+  font-size:10px;color:var(--sapContent_LabelColor);display:flex;justify-content:space-between;
+  flex-shrink:0}
+
+/* ── Loading ── */
+#loading{padding:40px;text-align:center;color:var(--sapContent_LabelColor);font-size:12px;
+  animation:glow 1.5s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.content-animate{animation:fadeIn .25s ease-out}
+</style>
+</head>
+<body>
+<div id="reader-wrap">
+  <div id="toolbar">
+    <span id="toolbar-title">⬡ BAPI RESPONSE READER</span>
+    <button class="tb-action" id="btn-copy-all">⎘ Copy all</button>
+    <button id="btn-close-reader">✕ Close</button>
+  </div>
+  <div id="content"><div id="loading">loading response...</div></div>
+  <div id="footer">
+    <span id="footer-stats"></span>
+    <span>ESC to close</span>
+  </div>
+</div>
+
+<script>
+// ── ABAP syntax highlighter ───────────────────────────────────────────────────
+const ABAP_KW = new Set([
+  'DATA','TYPES','CONSTANTS','FIELD-SYMBOLS','CLASS-DATA','CLASS-METHODS',
+  'FORM','ENDFORM','FUNCTION','ENDFUNCTION','METHOD','ENDMETHOD',
+  'CLASS','ENDCLASS','INTERFACE','ENDINTERFACE','MODULE','ENDMODULE',
+  'IF','ELSE','ELSEIF','ENDIF','CASE','WHEN','ENDCASE','OTHERS',
+  'LOOP','ENDLOOP','AT','ENDAT','DO','ENDDO','WHILE','ENDWHILE',
+  'SELECT','ENDSELECT','FROM','WHERE','INTO','TABLE','SINGLE','UP TO','ROWS',
+  'INNER JOIN','LEFT OUTER JOIN','ON','ORDER BY','GROUP BY','HAVING',
+  'READ','WRITE','MOVE','APPEND','INSERT','DELETE','MODIFY','COLLECT',
+  'COMMIT','WORK','ROLLBACK','CALL','FUNCTION','PERFORM','RAISE','RESUME',
+  'TRY','CATCH','CLEANUP','ENDTRY','RAISE EXCEPTION','TYPE HANDLE',
+  'ASSIGN','UNASSIGN','FIELD-SYMBOL','CREATE OBJECT','NEW','REF TO',
+  'IMPORTING','EXPORTING','CHANGING','RETURNING','EXCEPTIONS','USING',
+  'REPORT','PROGRAM','INCLUDE','TABLES','PARAMETERS','SELECT-OPTIONS',
+  'INITIALIZATION','START-OF-SELECTION','END-OF-SELECTION','AT SELECTION-SCREEN',
+  'BEGIN OF','END OF','TYPE','LIKE','VALUE','INITIAL','OPTIONAL','DEFAULT',
+  'CHECK','EXIT','CONTINUE','RETURN','STOP','REJECT','LEAVE','SUBMIT',
+  'MESSAGE','CONCATENATE','SPLIT','CONDENSE','TRANSLATE','REPLACE','SEARCH',
+  'DESCRIBE','SORT','BY','ASCENDING','DESCENDING','AS','INTO','SEPARATE BY',
+  'CLEAR','FREE','REFRESH','OPEN','CLOSE','TRANSFER','SET','GET','MOVE-CORRESPONDING',
+  'CORRESPONDING FIELDS OF','AUTHORITY-CHECK','OBJECT','FIELD','ID','DUMMY',
+  'EVENTS','RAISE','HANDLER','SET HANDLER','FOR','ALL INSTANCES',
+  'PUBLIC','PROTECTED','PRIVATE','SECTION','DEFINITION','IMPLEMENTATION',
+  'ABSTRACT','FINAL','STATIC','REDEFINITION','ALIASES','COMPONENT OF',
+  'IS BOUND','IS INITIAL','IS NOT INITIAL','EQ','NE','LT','GT','LE','GE',
+  'AND','OR','NOT','IN','BETWEEN','LIKE','BYPASSING BUFFER',
+  'CHANGING','TABLES','RESULT','EXCEPTIONS','OTHERS'
+]);
+
+const ABAP_KW2 = new Set([
+  'ADD','SUBTRACT','MULTIPLY','DIVIDE','COMPUTE','MOVE',
+  'WRITE TO','SHIFT','OVERLAY','CONVERT','DATE','TIME','TIMESTAMP',
+  'AT NEW','AT END OF','AT LAST','AT FIRST',
+  'CHAIN','ENDCHAIN','FIELD','ON CHANGE OF','ON REQUEST',
+  'CALL SCREEN','CALL TRANSACTION','LEAVE TO SCREEN','SET SCREEN',
+  'SUPPRESS DIALOG','EXPORT','IMPORT','DELETE FROM MEMORY',
+  'RANGES','SIGN','OPTION','LOW','HIGH','INCLUDE IN',
+]);
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function highlightABAP(line) {
+  let s = escapeHtml(line);
+
+  // Comments
+  if (/^\s*\*/.test(line)) return `<span class="cmt">${s}</span>`;
+  if (/^\s*"/.test(line))  return `<span class="cmt">${s}</span>`;
+
+  // Inline comments after "."
+  s = s.replace(/((&quot;)[^$]*)$/, '<span class="cmt">$1</span>');
+
+  // SY- fields
+  s = s.replace(/\b(sy-[a-zA-Z_0-9]+)\b/gi, '<span class="sy">$1</span>');
+
+  // Strings
+  s = s.replace(/'([^']*)'/g, "<span class=\"str\">'$1'</span>");
+  s = s.replace(/`([^`]*)`/g, '<span class="str">`$1`</span>');
+
+  // Numbers
+  s = s.replace(/\b(\d+)\b/g, '<span class="num">$1</span>');
+
+  // Primary keywords (word boundary, case-insensitive)
+  const kwPattern = Array.from(ABAP_KW)
+    .sort((a, b) => b.length - a.length)
+    .map(k => k.replace(/[-]/g, '[-]').replace(/\s+/g, '\\s+'))
+    .join('|');
+  s = s.replace(new RegExp(`\\b(${kwPattern})\\b`, 'gi'),
+    m => `<span class="kw">${m}</span>`);
+
+  return s;
+}
+
+function highlightCode(code, lang) {
+  const lines = code.split('\n');
+  const rows = lines.map((line, i) => {
+    const hl = (lang === 'abap' || lang === '') ? highlightABAP(line) : escapeHtml(line);
+    return `<tr>
+      <td class="line-num">${i + 1}</td>
+      <td class="line-code">${hl}</td>
+    </tr>`;
+  }).join('');
+  return `<table class="code-table">${rows}</table>`;
+}
+
+// ── Parse message → HTML ──────────────────────────────────────────────────────
+function parseMessage(text) {
+  const parts = [];
+  const codeRx = /```(\w*)\n?([\s\S]*?)```/g;
+  let last = 0, m;
+
+  while ((m = codeRx.exec(text)) !== null) {
+    if (m.index > last) parts.push({ type: 'text', content: text.slice(last, m.index) });
+    parts.push({ type: 'code', lang: m[1].toLowerCase() || 'abap', content: m[2].trimEnd() });
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push({ type: 'text', content: text.slice(last) });
+
+  return parts.map(p => {
+    if (p.type === 'code') {
+      const highlighted = highlightCode(p.content, p.lang);
+      const label = p.lang ? p.lang.toUpperCase() : 'ABAP';
+      const raw = p.content.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return `<div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">${label}</span>
+          <button class="code-copy" data-code="${encodeURIComponent(p.content)}">⎘ copy</button>
+        </div>
+        <div class="code-body"><div style="overflow-x:auto">${highlighted}</div></div>
+      </div>`;
+    } else {
+      // Render text: inline code, line breaks, bold
+      let html = escapeHtml(p.content)
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:var(--sapTextColor)">$1</strong>')
+        .replace(/\n/g, '<br>');
+      return `<div class="prose-block">${html}</div>`;
+    }
+  }).join('');
+}
+
+// ── Load and render content ───────────────────────────────────────────────────
+async function loadContent() {
+  try {
+    const data = await window.bapi.storeGet('_readerContent');
+    if (!data) {
+      document.getElementById('content').innerHTML = '<div style="padding:40px;color:var(--sapContent_LabelColor)">No content.</div>';
+      return;
+    }
+
+    // Apply theme
+    // Apply theme via data-sap-theme attribute (tokens are embedded, instant)
+    if (data.theme) {
+      document.documentElement.setAttribute('data-sap-theme', data.theme);
+    }
+
+    const html = parseMessage(data.content);
+    const div  = document.createElement('div');
+    div.className = 'content-animate';
+    div.innerHTML = html;
+    document.getElementById('content').innerHTML = '';
+    document.getElementById('content').appendChild(div);
+
+    // Copy buttons
+    div.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        navigator.clipboard.writeText(decodeURIComponent(btn.dataset.code));
+        btn.textContent = '✓ copied';
+        setTimeout(() => { btn.textContent = '⎘ copy'; }, 1800);
+      });
+    });
+
+    // Footer stats
+    const words = data.content.split(/\s+/).length;
+    const codeBlocks = (data.content.match(/```/g) || []).length / 2;
+    document.getElementById('footer-stats').textContent =
+      `~${words} words · ${Math.ceil(codeBlocks)} code block${codeBlocks !== 1 ? 's' : ''}`;
+
+    // Store raw for copy-all
+    document.getElementById('btn-copy-all').dataset.raw = data.content;
+
+  } catch (e) {
+    document.getElementById('content').innerHTML = `<div style="padding:40px;color:var(--sapNegativeColor)">Error: ${e.message}</div>`;
+  }
+}
+
+// ── Controls ──────────────────────────────────────────────────────────────────
+document.getElementById('btn-close-reader').addEventListener('click', () => window.close());
+document.getElementById('btn-copy-all').addEventListener('click', (e) => {
+  const raw = e.currentTarget.dataset.raw || '';
+  navigator.clipboard.writeText(raw);
+  e.currentTarget.textContent = '✓ Copied!';
+  setTimeout(() => { e.currentTarget.textContent = '⎘ Copy all'; }, 2000);
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') window.close();
+});
+
+// Refresh when main sends new content
+window.bapi.onReaderRefresh(loadContent);
+
+loadContent();
+</script>
+</body>
+</html>

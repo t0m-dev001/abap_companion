@@ -1,0 +1,52 @@
+{
+  "name": "bapi-companion",
+  "version": "3.0.0",
+  "description": "BAPI — Your ABAP Code Companion",
+  "main": "main.js",
+  "author": "Your Name",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win --x64",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.bapi.companion",
+    "productName": "BAPI",
+    "copyright": "Copyright © 2025",
+    "asar": true,
+    "files": ["**/*", "!node_modules/.cache/**", "!dist/**", "!*.bat", "!*.md"],
+    "directories": { "output": "dist", "buildResources": "assets" },
+    "win": {
+      "target": [
+        { "target": "nsis",     "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "icon": "assets/icon.ico",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "BAPI",
+      "runAfterFinish": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "license": "LICENSE.txt",
+      "artifactName": "BAPI-Setup-${version}.exe"
+    },
+    "portable": { "artifactName": "BAPI-Portable-${version}.exe" },
+    "publish": null
+  }
+}
