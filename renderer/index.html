@@ -560,6 +560,40 @@ body.collapsed #collapse-expand{display:flex}
 }
 #app:hover #resize-hint{opacity:.6}
 
+
+/* ════════════════════════════════════════════════════════
+   PET DESIGN PICKER  — visual tile selector (like theme picker)
+   ════════════════════════════════════════════════════════ */
+.pet-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:4px;
+}
+.pet-swatch {
+  aspect-ratio:1; cursor:pointer;
+  border:2px solid var(--sapContent_ForegroundBorderColor);
+  border-radius:var(--sapElement_BorderRadius);
+  transition:border-color .15s, transform .12s;
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:3px; padding:4px;
+  background:var(--sapGroup_ContentBackground);
+  overflow:hidden; position:relative;
+}
+.pet-swatch:hover  { transform:scale(1.06); border-color:var(--sapHighlightColor); }
+.pet-swatch.active { border-color:var(--sapHighlightColor); background:var(--sapList_SelectionBackgroundColor); }
+.pet-swatch-icon   { font-size:22px; line-height:1; }
+.pet-swatch-label  {
+  font-family:var(--sapFontFamily); font-size:.5625rem; font-weight:700;
+  color:var(--sapContent_LabelColor); text-align:center; line-height:1.2;
+  letter-spacing:.03em;
+}
+.pet-swatch.active .pet-swatch-label { color:var(--sapHighlightColor); }
+.pet-swatch-badge {
+  position:absolute; top:3px; right:3px;
+  font-size:.4375rem; font-weight:700;
+  color:var(--sapCriticalColor); border:1px solid var(--sapCriticalColor);
+  border-radius:3px; padding:0 3px; background:transparent;
+  font-family:var(--sapFontFamily);
+}
+
 /* ════ KEYFRAMES ════ */
 @keyframes floatAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 @keyframes bounceAnim{0%,100%{transform:translateY(0)}35%{transform:translateY(-12px)}65%{transform:translateY(-5px)}}
@@ -593,29 +627,11 @@ body.collapsed #collapse-expand{display:flex}
     </div>
   </div>
 
-  <!-- Pet -->
+  <!-- Pet — rendered dynamically by active PetRenderer class -->
   <div id="pet-area">
     <div id="pet-wrap">
-      <svg viewBox="0 0 92 104" width="80" height="90" style="overflow:visible">
-        <ellipse cx="46" cy="100" rx="22" ry="3.5" fill="var(--sapHighlightColor)" opacity=".1"/>
-        <line x1="46" y1="15" x2="46" y2="3" stroke="var(--sapContent_ForegroundBorderColor)" stroke-width="1.8" stroke-linecap="round"/>
-        <circle id="ant-dot" cx="46" cy="2.5" r="3.8" fill="var(--sapHighlightColor)"/>
-        <rect x="9" y="15" width="74" height="66" rx="12" fill="var(--sapBaseColor)" stroke="var(--sapHighlightColor)" stroke-width="1.2"/>
-        <rect x="15" y="21" width="62" height="54" rx="9" fill="var(--sapBackgroundColor)" opacity=".6"/>
-        <rect id="eye-l" class="bapi-eye" x="21" y="34" width="19" height="19" rx="4" fill="var(--sapHighlightColor)" opacity=".95"/>
-        <rect x="26" y="39" width="6" height="6" rx="1.5" fill="var(--sapBackgroundColor)"/>
-        <rect id="eye-r" class="bapi-eye" x="52" y="34" width="19" height="19" rx="4" fill="var(--sapHighlightColor)" opacity=".95"/>
-        <rect x="57" y="39" width="6" height="6" rx="1.5" fill="var(--sapBackgroundColor)"/>
-        <path id="bapi-mouth" d="M27 62 Q46 75 65 62" fill="none" stroke="var(--sapHighlightColor)" stroke-width="2" stroke-linecap="round" opacity=".85"/>
-        <rect x="1"  y="35" width="9" height="5.5" rx="2.5" fill="var(--sapContent_ForegroundColor)" stroke="var(--sapContent_ForegroundBorderColor)" stroke-width=".5"/>
-        <rect x="1"  y="45" width="9" height="5.5" rx="2.5" fill="var(--sapContent_ForegroundColor)" stroke="var(--sapContent_ForegroundBorderColor)" stroke-width=".5"/>
-        <rect x="82" y="35" width="9" height="5.5" rx="2.5" fill="var(--sapContent_ForegroundColor)" stroke="var(--sapContent_ForegroundBorderColor)" stroke-width=".5"/>
-        <circle cx="26" cy="81" r="2.8" fill="var(--sapPositiveColor)" opacity=".7"/>
-        <circle cx="36" cy="81" r="2.8" fill="var(--sapCriticalColor)" opacity=".35"/>
-        <circle cx="46" cy="81" r="2.8" fill="var(--sapContent_ForegroundColor)"/>
-        <rect x="24" y="81" width="15" height="15" rx="7.5" fill="var(--sapContent_ForegroundColor)" stroke="var(--sapContent_ForegroundBorderColor)" stroke-width=".5"/>
-        <rect x="53" y="81" width="15" height="15" rx="7.5" fill="var(--sapContent_ForegroundColor)" stroke="var(--sapContent_ForegroundBorderColor)" stroke-width=".5"/>
-      </svg>
+      <!-- #pet-container is the injection point for all 3 renderer designs -->
+      <div id="pet-container" style="display:flex;align-items:center;justify-content:center;min-height:90px"></div>
     </div>
     <div id="pet-status">READY</div>
     <div id="collapse-expand"><button id="btn-expand">▲ OPEN CHAT</button></div>
@@ -706,6 +722,33 @@ body.collapsed #collapse-expand{display:flex}
         </div>
       </div>
 
+
+      <!-- Pet Design -->
+      <div class="s-group">
+        <label class="s-label">Pet Design</label>
+        <div class="pet-grid">
+          <div class="pet-swatch" data-pet="pixel" title="Retro Pixel — classic 8-bit Tamagotchi style">
+            <div class="pet-swatch-icon">🕹️</div>
+            <div class="pet-swatch-label">Retro<br>Pixel</div>
+          </div>
+          <div class="pet-swatch" data-pet="fiori" title="Fiori Float — SAP Fiori-style rotating crystal">
+            <div class="pet-swatch-icon">💎</div>
+            <div class="pet-swatch-label">Fiori<br>Float</div>
+          </div>
+          <div class="pet-swatch" data-pet="desktoy" title="Desk Toy — holographic robot (coming soon)">
+            <div class="pet-swatch-icon">🤖</div>
+            <div class="pet-swatch-label">Desk<br>Toy</div>
+            <span class="pet-swatch-badge">WIP</span>
+          </div>
+        </div>
+        <div style="margin-top:4px;font-size:.6rem;color:var(--sapContent_LabelColor);line-height:1.5">
+          <b style="color:var(--sapTextColor)">Retro Pixel</b> — classic Tamagotchi, SAP GUI native &nbsp;
+          <b style="color:var(--sapTextColor)">Fiori Float</b> — modern Fiori-aligned crystal &nbsp;
+          <b style="color:var(--sapTextColor)">Desk Toy</b> — 3D holographic robot (WIP)
+        </div>
+      </div>
+
+      <hr class="s-divider">
       <div class="s-group">
         <label class="s-label">Window Opacity</label>
         <div class="opacity-row">
@@ -775,6 +818,9 @@ body.collapsed #collapse-expand{display:flex}
 
 </div>
 <div id="resize-hint"></div>
+<script src="pets/pixel.js"></script>
+<script src="pets/fiori.js"></script>
+<script src="pets/desktoy.js"></script>
 <script src="renderer.js"></script>
 </body>
 </html>

@@ -56,13 +56,39 @@ let isBusy       = false;
 let reminders    = [];
 let editReminders = [];
 let allModels    = [];
-let currentTheme = 'hacker';
+let currentTheme  = 'hacker';
+let currentPet    = 'pixel';
+
+// ── Pet Renderer Coordinator ──────────────────────────────────────────────────
+const PET_RENDERERS = {
+  pixel:   PixelPetRenderer,
+  fiori:   FioriPetRenderer,
+  desktoy: DeskToyPetRenderer,
+};
+let activePetRenderer = null;
+
+function mountPetRenderer(petId) {
+  const container = document.getElementById('pet-container');
+  if (!container) return;
+  if (activePetRenderer) { try { activePetRenderer.unmount(); } catch(_) {} activePetRenderer = null; }
+  const Cls = PET_RENDERERS[petId] || PET_RENDERERS.pixel;
+  activePetRenderer = new Cls(container);
+  activePetRenderer.mount();
+  currentPet = petId;
+  document.querySelectorAll('.pet-swatch').forEach(s => {
+    s.classList.toggle('active', s.dataset.pet === petId);
+  });
+}
+
+async function loadPetDesign() {
+  const saved = (await window.bapi.storeGet('petDesign')) || 'pixel';
+  mountPetRenderer(saved);
+}
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
-const petWrap   = document.getElementById('pet-wrap');
+// Note: petWrap/antDot/mouth are now owned by individual pet renderers.
+// Only petStatus remains as a shared label below the pet-container.
 const petStatus = document.getElementById('pet-status');
-const antDot    = document.getElementById('ant-dot');
-const mouth     = document.getElementById('bapi-mouth');
 const chatArea  = document.getElementById('chat-area');
 const pillsEl   = document.getElementById('pills');
 const userInput = document.getElementById('user-input');
@@ -88,34 +114,24 @@ async function loadTheme() {
 }
 
 // ── Pet state machine ─────────────────────────────────────────────────────────
+// Routes state to the active renderer. The SVG-based PET methods are only
+// used by the default 'pixel' renderer as its own internal logic.
 const PET = {
-  idle() {
-    petWrap.style.animation = 'floatAnim 3.4s ease-in-out infinite';
-    petStatus.textContent   = 'READY'; petStatus.style.color = 'var(--accent)';
-    antDot.style.animation  = 'glow 2s ease-in-out infinite';
-    mouth.setAttribute('d', 'M27 62 Q46 75 65 62'); mouth.style.opacity = '.82';
-  },
-  thinking() {
-    petWrap.style.animation = 'none';
-    petStatus.textContent   = 'THINKING...'; petStatus.style.color = 'var(--amber)';
-    antDot.style.animation  = 'fastFlash .22s infinite';
-    mouth.setAttribute('d', 'M32 64 Q46 64 60 64'); mouth.style.opacity = '.3';
-  },
-  happy() {
-    petWrap.style.animation = 'bounceAnim .42s ease-in-out 3';
-    petStatus.textContent   = 'DONE!'; petStatus.style.color = 'var(--accent)';
-    antDot.style.animation  = 'glow .55s infinite';
-    mouth.setAttribute('d', 'M22 58 Q46 76 70 58'); mouth.style.opacity = '1';
-    setTimeout(() => PET.idle(), 2800);
-  },
-  error() {
-    petWrap.style.animation = 'shake .4s ease-in-out';
-    petStatus.textContent   = 'ERROR'; petStatus.style.color = 'var(--red)';
-    antDot.style.animation  = 'fastFlash .5s infinite';
-    mouth.setAttribute('d', 'M28 68 Q46 60 64 68'); mouth.style.opacity = '.7';
-    setTimeout(() => PET.idle(), 3000);
-  },
+  idle()     { if (activePetRenderer) activePetRenderer.setState('idle');     _updateStatus('idle');     },
+  thinking() { if (activePetRenderer) activePetRenderer.setState('thinking'); _updateStatus('thinking'); },
+  happy()    { if (activePetRenderer) activePetRenderer.setState('happy');    _updateStatus('happy');    },
+  error()    { if (activePetRenderer) activePetRenderer.setState('error');    _updateStatus('error');    },
 };
+
+function _updateStatus(state) {
+  const labels = { idle:'READY', thinking:'THINKING...', happy:'DONE!', error:'ERROR' };
+  const colors = { idle:'var(--sapHighlightColor)', thinking:'var(--sapCriticalColor)',
+                   happy:'var(--sapPositiveColor)', error:'var(--sapNegativeColor)' };
+  if (petStatus) {
+    petStatus.textContent  = activePetRenderer?.getStatusText(state) ?? labels[state] ?? 'READY';
+    petStatus.style.color  = colors[state] || 'var(--sapHighlightColor)';
+  }
+}
 
 // ── Collapse / Expand ─────────────────────────────────────────────────────────
 function collapse() {
@@ -250,7 +266,7 @@ function renderReminderList() {
 // ── Settings open/save ────────────────────────────────────────────────────────
 async function openSettings() {
   overlay.classList.remove('hidden');
-  const [apiKey, model, provider, savedRem, remEnabled, startLogin, opacity] = await Promise.all([
+  const [apiKey, model, provider, savedRem, remEnabled, startLogin, opacity, petDesign] = await Promise.all([
     window.bapi.storeGet('apiKey'),
     window.bapi.storeGet('apiModel'),
     window.bapi.storeGet('apiProvider'),
@@ -258,6 +274,7 @@ async function openSettings() {
     window.bapi.storeGet('remindersEnabled'),
     window.bapi.storeGet('startOnLogin'),
     window.bapi.storeGet('opacity'),
+    window.bapi.storeGet('petDesign'),
   ]);
 
   const prov = provider || 'google';
@@ -311,6 +328,7 @@ async function saveSettings() {
     window.bapi.storeSet('startOnLogin',     startLogin),
     window.bapi.storeSet('theme',            currentTheme),
     window.bapi.storeSet('opacity',          opPct / 100),
+    window.bapi.storeSet('petDesign',        currentPet),
   ]);
 
   window.bapi.setOpacity(opPct / 100);
@@ -437,6 +455,16 @@ document.querySelectorAll('.theme-swatch').forEach(s => {
   s.addEventListener('click', () => applyTheme(s.dataset.theme));
 });
 
+// Pet design swatches
+document.querySelectorAll('.pet-swatch').forEach(s => {
+  s.addEventListener('click', () => {
+    if (s.dataset.pet === 'desktoy') {
+      // Still mount the placeholder — shows WIP card
+    }
+    mountPetRenderer(s.dataset.pet);
+  });
+});
+
 // Opacity slider — live preview
 document.getElementById('opacity-slider').addEventListener('input', (e) => {
   const v = +e.target.value;
@@ -467,6 +495,7 @@ window.bapi.onOpenSettings(openSettings);
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
   await loadTheme();
+  await loadPetDesign();
 
   const [apiKey, savedHistory, savedRem, collapsed, opacity] = await Promise.all([
     window.bapi.storeGet('apiKey'),
