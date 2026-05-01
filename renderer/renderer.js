@@ -57,7 +57,8 @@ let reminders    = [];
 let editReminders = [];
 let allModels    = [];
 let currentTheme  = 'hacker';
-let currentPet    = 'pixel';
+let currentPet         = 'pixel';
+let tamagotchiEnabled  = false;
 
 // ── Pet Renderer Coordinator ──────────────────────────────────────────────────
 const PET_RENDERERS = {
@@ -96,6 +97,35 @@ const sendBtn   = document.getElementById('send-btn');
 const overlay   = document.getElementById('settings-overlay');
 
 // ── Theme ─────────────────────────────────────────────────────────────────────
+// ── Tamagotchi mode toggle ────────────────────────────────────────────────────
+function applyTamagotchiMode(enabled) {
+  tamagotchiEnabled = enabled;
+  const hint = document.getElementById('tama-hint');
+  if (hint) hint.style.display = enabled ? 'block' : 'none';
+  let bar = document.getElementById('tama-action-bar');
+  if (enabled && !bar) {
+    bar = document.createElement('div');
+    bar.id = 'tama-action-bar';
+    bar.style.cssText = 'display:flex;justify-content:center;gap:8px;padding:5px 10px;' +
+      'background:var(--sapBaseColor);border-bottom:1px solid var(--sapList_BorderColor)';
+    bar.title = 'Tamagotchi interactions — coming in v4.0';
+    ['🍕','🎮','🧼','💊','💡'].forEach(icon => {
+      const btn = document.createElement('button');
+      btn.textContent = icon;
+      btn.title = 'Coming in v4.0';
+      btn.style.cssText = 'background:none;border:1px solid var(--sapContent_ForegroundBorderColor);' +
+        'border-radius:var(--sapElement_BorderRadius);width:32px;height:28px;' +
+        'cursor:not-allowed;font-size:14px;opacity:.35;';
+      btn.disabled = true;
+      bar.appendChild(btn);
+    });
+    const pillsWrap = document.getElementById('pills-wrap');
+    if (pillsWrap) pillsWrap.parentNode.insertBefore(bar, pillsWrap);
+  } else if (!enabled && bar) {
+    bar.remove();
+  }
+}
+
 function applyTheme(themeId) {
   // Directly set the data-sap-theme attribute on <html>.
   // CSS selectors html[data-sap-theme="..."] are already embedded in index.html —
@@ -266,7 +296,7 @@ function renderReminderList() {
 // ── Settings open/save ────────────────────────────────────────────────────────
 async function openSettings() {
   overlay.classList.remove('hidden');
-  const [apiKey, model, provider, savedRem, remEnabled, startLogin, opacity, petDesign] = await Promise.all([
+  const [apiKey, model, provider, savedRem, remEnabled, startLogin, opacity, petDesign, tamaEnabled] = await Promise.all([
     window.bapi.storeGet('apiKey'),
     window.bapi.storeGet('apiModel'),
     window.bapi.storeGet('apiProvider'),
@@ -275,6 +305,7 @@ async function openSettings() {
     window.bapi.storeGet('startOnLogin'),
     window.bapi.storeGet('opacity'),
     window.bapi.storeGet('petDesign'),
+    window.bapi.storeGet('tamagotchiEnabled'),
   ]);
 
   const prov = provider || 'google';
@@ -284,6 +315,9 @@ async function openSettings() {
   updateModelHints(prov);
   setToggle('toggle-reminders', remEnabled !== false);
   setToggle('toggle-login',     !!startLogin);
+  setToggle('toggle-tamagotchi', !!tamaEnabled);
+  const tamaHint = document.getElementById('tama-hint');
+  if (tamaHint) tamaHint.style.display = tamaEnabled ? 'block' : 'none';
 
   const opVal = Math.round((opacity || 1.0) * 100);
   document.getElementById('opacity-slider').value = opVal;
@@ -332,6 +366,8 @@ async function saveSettings() {
   ]);
 
   window.bapi.setOpacity(opPct / 100);
+  tamagotchiEnabled = isToggleOn('toggle-tamagotchi');
+  applyTamagotchiMode(tamagotchiEnabled);
   window.bapi.settingsSaved({ startOnLogin: startLogin, reminders: valid });
 
   reminders = valid;
@@ -450,6 +486,15 @@ document.getElementById('link-console').addEventListener('click', () => window.b
 document.getElementById('link-google').addEventListener('click',  () => window.bapi.openUrl('https://aistudio.google.com/app/apikey'));
 document.getElementById('inp-provider').addEventListener('change', e => updateModelHints(e.target.value));
 
+// Tamagotchi toggle hint
+const tamaToggle = document.getElementById('toggle-tamagotchi');
+if (tamaToggle) {
+  tamaToggle.addEventListener('click', () => {
+    const hint = document.getElementById('tama-hint');
+    if (hint) hint.style.display = tamaToggle.classList.contains('on') ? 'block' : 'none';
+  });
+}
+
 // Theme swatches
 document.querySelectorAll('.theme-swatch').forEach(s => {
   s.addEventListener('click', () => applyTheme(s.dataset.theme));
@@ -496,6 +541,9 @@ window.bapi.onOpenSettings(openSettings);
 async function init() {
   await loadTheme();
   await loadPetDesign();
+  const savedTama = (await window.bapi.storeGet('tamagotchiEnabled')) || false;
+  tamagotchiEnabled = savedTama;
+  applyTamagotchiMode(savedTama);
 
   const [apiKey, savedHistory, savedRem, collapsed, opacity] = await Promise.all([
     window.bapi.storeGet('apiKey'),
