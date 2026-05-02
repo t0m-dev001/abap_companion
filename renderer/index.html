@@ -343,11 +343,26 @@ body.collapsed #collapse-expand{display:flex}
 .msg-user{align-self:flex-end;background:var(--_msg_user_bg);
   color:var(--sapTextColor);border-color:var(--sapList_BorderColor);margin-left:8%}
 .msg-thinking{opacity:.5;font-style:italic}
-.msg-expand-btn{position:absolute;bottom:4px;right:5px;background:none;border:none;
-  color:var(--sapContent_LabelColor);font-family:"SAP-icons";font-size:.75rem;
-  cursor:pointer;opacity:0;transition:opacity .15s;line-height:1;padding:2px}
-.msg:hover .msg-expand-btn{opacity:.8}
-.msg-expand-btn:hover{color:var(--sapHighlightColor);opacity:1!important}
+/* ── 3 message action buttons — right-aligned row at bottom ── */
+.msg-actions{
+  position:absolute;bottom:3px;right:4px;
+  display:flex;align-items:center;gap:1px;
+  opacity:0;transition:opacity .15s;
+}
+.msg:hover .msg-actions{opacity:1}
+.msg-action-btn{
+  background:none;border:none;
+  color:var(--sapContent_LabelColor);
+  font-size:.75rem;cursor:pointer;
+  padding:2px 3px;border-radius:3px;
+  transition:color .12s,background .12s;
+  line-height:1;
+}
+.msg-action-btn:hover{color:var(--sapHighlightColor);background:var(--sapList_HoverBackground)}
+/* Keep old class names working for compatibility */
+.msg-expand-btn,.msg-copy-btn,.msg-save-btn{
+  position:static;opacity:1;
+}
 
 /* ════════════════════════════════════════════════════════
    INPUT BAR — SAP Footer Toolbar
@@ -621,24 +636,7 @@ body.collapsed #collapse-expand{display:flex}
 }
 .msg pre::-webkit-scrollbar{height:3px}
 .msg pre::-webkit-scrollbar-thumb{background:var(--sapScrollBar_FaceColor)}
-.msg-copy-btn {
-  position:absolute;bottom:4px;right:24px;
-  background:none;border:none;
-  color:var(--sapContent_LabelColor);
-  font-size:.75rem;cursor:pointer;
-  opacity:0;transition:opacity .15s;line-height:1;padding:2px;
-}
-.msg:hover .msg-copy-btn{opacity:.8}
-.msg-copy-btn:hover{color:var(--sapHighlightColor);opacity:1!important}
-.msg-save-btn {
-  position:absolute;bottom:4px;right:4px;
-  background:none;border:none;
-  color:var(--sapContent_LabelColor);
-  font-size:.75rem;cursor:pointer;
-  opacity:0;transition:opacity .15s;line-height:1;padding:2px;
-}
-.msg:hover .msg-save-btn{opacity:.8}
-.msg-save-btn:hover{color:var(--sapHighlightColor);opacity:1!important}
+/* copy/save buttons are now inside .msg-actions flex row — see above */
 
 /* ── Phase 3: Input toolbar (new session + history + snippets) ── */
 #input-toolbar {

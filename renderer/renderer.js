@@ -155,17 +155,19 @@ function addMsg(role, text, id) {
 
   if (role === 'assistant' && text !== '...') {
     div.innerHTML = renderMessageContent(text);
-    // Expand to reader button
+    // Action button row — expand, copy, save — grouped so they don't overlap
+    const actions = document.createElement('div');
+    actions.className = 'msg-actions';
+
     const expandBtn = document.createElement('button');
-    expandBtn.className   = 'msg-expand-btn';
-    expandBtn.title       = 'Open in reader';
+    expandBtn.className   = 'msg-action-btn msg-expand-btn';
+    expandBtn.title       = 'Open in reader popup';
     expandBtn.textContent = '⤢';
     expandBtn.addEventListener('click', e => { e.stopPropagation(); window.bapi.openReader(text, currentTheme); });
-    div.appendChild(expandBtn);
-    // Copy button
+
     const copyBtn = document.createElement('button');
-    copyBtn.className   = 'msg-copy-btn';
-    copyBtn.title       = 'Copy message';
+    copyBtn.className   = 'msg-action-btn msg-copy-btn';
+    copyBtn.title       = 'Copy to clipboard';
     copyBtn.textContent = '⎘';
     copyBtn.addEventListener('click', e => {
       e.stopPropagation();
@@ -173,10 +175,9 @@ function addMsg(role, text, id) {
       copyBtn.textContent = '✓';
       setTimeout(() => { copyBtn.textContent = '⎘'; }, 1500);
     });
-    div.appendChild(copyBtn);
-    // Save to snippet button
+
     const saveBtn = document.createElement('button');
-    saveBtn.className   = 'msg-save-btn';
+    saveBtn.className   = 'msg-action-btn msg-save-btn';
     saveBtn.title       = 'Save to Snippet Vault';
     saveBtn.textContent = '💾';
     saveBtn.addEventListener('click', async e => {
@@ -185,7 +186,11 @@ function addMsg(role, text, id) {
       saveBtn.textContent = '✓';
       setTimeout(() => { saveBtn.textContent = '💾'; }, 1500);
     });
-    div.appendChild(saveBtn);
+
+    actions.appendChild(expandBtn);
+    actions.appendChild(copyBtn);
+    actions.appendChild(saveBtn);
+    div.appendChild(actions);
   } else {
     div.textContent = text;
   }
@@ -232,25 +237,26 @@ async function sendMessage(overrideText) {
       bubble.classList.remove('msg-thinking');
       // Re-render with inline code highlight
       bubble.innerHTML = renderMessageContent(reply);
-      // Re-add action buttons
-      const expandBtn = document.createElement('button');
-      expandBtn.className = 'msg-expand-btn'; expandBtn.title = 'Open in reader'; expandBtn.textContent = '⤢';
-      expandBtn.addEventListener('click', e => { e.stopPropagation(); window.bapi.openReader(reply, currentTheme); });
-      const copyBtn = document.createElement('button');
-      copyBtn.className = 'msg-copy-btn'; copyBtn.title = 'Copy'; copyBtn.textContent = '⎘';
-      copyBtn.addEventListener('click', e => {
+      // Re-add action button row
+      const actions2 = document.createElement('div');
+      actions2.className = 'msg-actions';
+      const eb2 = document.createElement('button');
+      eb2.className = 'msg-action-btn msg-expand-btn'; eb2.title = 'Open in reader popup'; eb2.textContent = '⤢';
+      eb2.addEventListener('click', e => { e.stopPropagation(); window.bapi.openReader(reply, currentTheme); });
+      const cb2 = document.createElement('button');
+      cb2.className = 'msg-action-btn msg-copy-btn'; cb2.title = 'Copy'; cb2.textContent = '⎘';
+      cb2.addEventListener('click', e => {
         e.stopPropagation(); navigator.clipboard.writeText(reply);
-        copyBtn.textContent = '✓'; setTimeout(() => { copyBtn.textContent = '⎘'; }, 1500);
+        cb2.textContent = '✓'; setTimeout(() => { cb2.textContent = '⎘'; }, 1500);
       });
-      const saveBtn = document.createElement('button');
-      saveBtn.className = 'msg-save-btn'; saveBtn.title = 'Save snippet'; saveBtn.textContent = '💾';
-      saveBtn.addEventListener('click', async e => {
+      const sb2 = document.createElement('button');
+      sb2.className = 'msg-action-btn msg-save-btn'; sb2.title = 'Save snippet'; sb2.textContent = '💾';
+      sb2.addEventListener('click', async e => {
         e.stopPropagation(); await SNIPPETS.save(reply);
-        saveBtn.textContent = '✓'; setTimeout(() => { saveBtn.textContent = '💾'; }, 1500);
+        sb2.textContent = '✓'; setTimeout(() => { sb2.textContent = '💾'; }, 1500);
       });
-      bubble.appendChild(expandBtn);
-      bubble.appendChild(copyBtn);
-      bubble.appendChild(saveBtn);
+      actions2.appendChild(eb2); actions2.appendChild(cb2); actions2.appendChild(sb2);
+      bubble.appendChild(actions2);
 
       chatHistory.push({ role: 'assistant', content: reply });
       PET.happy();

@@ -234,8 +234,18 @@ const TAMA_UI = {
     document.getElementById('tama-food-close').addEventListener('click', () => modal.remove());
 
     modal.querySelectorAll('.tama-food-item').forEach(btn => {
-      btn.addEventListener('mouseenter', () => { btn.style.background = 'var(--sapList_HoverBackground)'; btn.style.borderColor = 'var(--sapHighlightColor)'; });
-      btn.addEventListener('mouseleave', () => { btn.style.background = ''; btn.style.borderColor = ''; });
+      btn.addEventListener('mouseenter', () => {
+        btn.style.background   = 'var(--sapList_HoverBackground)';
+        btn.style.borderColor  = 'var(--sapHighlightColor)';
+        btn.style.color        = 'var(--sapTextColor)';
+      });
+      btn.addEventListener('mouseleave', () => {
+        // Must explicitly reset — clearing to '' drops the inline style value
+        // causing the item to appear permanently hovered after first interaction
+        btn.style.background   = 'var(--sapGroup_ContentBackground)';
+        btn.style.borderColor  = 'var(--sapGroup_BorderColor)';
+        btn.style.color        = '';
+      });
       btn.addEventListener('click', () => {
         tamaEngine.feed(btn.dataset.food);
         modal.remove();
