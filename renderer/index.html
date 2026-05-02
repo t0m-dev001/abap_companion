@@ -293,9 +293,14 @@ body.collapsed #collapse-expand{display:flex}
 /* ════════════════════════════════════════════════════════
    PET AREA
    ════════════════════════════════════════════════════════ */
-#pet-area{background:var(--sapBaseColor);padding:14px 0 8px;text-align:center;
+#pet-area{background:var(--sapBaseColor);padding:14px 0 8px;text-align:center;cursor:pointer;
   border-bottom:1px solid var(--sapList_BorderColor);
   flex-shrink:0;position:relative;overflow:hidden;transition:background .25s}
+#pet-area:hover::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(ellipse at center,color-mix(in srgb,var(--sapHighlightColor) 8%,transparent) 0%,transparent 70%);
+  border-radius:inherit;
+}
 #pet-area::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.016) 2px,rgba(255,255,255,.016) 4px)}
 #pet-wrap{display:inline-block;animation:floatAnim 3.4s ease-in-out infinite}
@@ -670,6 +675,7 @@ body.collapsed #collapse-expand{display:flex}
 #lang-pill:hover{background:var(--sapButton_Hover_Background)}
 
 /* ════ KEYFRAMES ════ */
+@keyframes ff-float{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-30px);opacity:0}}
 @keyframes floatAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 @keyframes bounceAnim{0%,100%{transform:translateY(0)}35%{transform:translateY(-12px)}65%{transform:translateY(-5px)}}
 @keyframes blinkEye{0%,88%,100%{transform:scaleY(1)}93%{transform:scaleY(.07)}}

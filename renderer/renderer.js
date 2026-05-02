@@ -503,13 +503,97 @@ function setupDrag(el) {
   });
 }
 
+
+// ── Pet click interaction ─────────────────────────────────────────────────────
+// Random gestures — purely visual, run regardless of tamagotchi mode.
+// When tamagotchi ON, also strengthens the bond.
+const PET_GESTURES = [
+  { anim: 'bounceAnim .5s ease-in-out 2', emoji: '❤️',  label: 'Loves it!'     },
+  { anim: 'bounceAnim .4s ease-in-out 3', emoji: '😊',  label: 'Happy!'        },
+  { anim: 'shake .35s ease-in-out',       emoji: '🙈',  label: 'Shy!'          },
+  { anim: 'bounceAnim .4s ease-in-out 2', emoji: '✨',  label: 'Sparkle!'      },
+  { anim: 'bounceAnim .5s ease-in-out 3', emoji: '🎉',  label: 'Yay!'          },
+  { anim: 'shake .3s ease-in-out',        emoji: '😄',  label: 'Hehe!'         },
+  { anim: 'bounceAnim .6s ease-in-out 2', emoji: '💙',  label: 'Bonding!'      },
+  { anim: 'bounceAnim .4s ease-in-out 2', emoji: '⚡',  label: 'Energised!'    },
+  { anim: 'shake .25s ease-in-out',       emoji: '🤭',  label: 'Ticklish!'     },
+  { anim: 'bounceAnim .5s ease-in-out 2', emoji: '🔥',  label: 'Fired up!'     },
+];
+
+let _lastGestureTs = 0;
+
+function onPetClicked(e) {
+  // In collapsed mode — just expand, no gesture
+  if (document.body.classList.contains('collapsed')) { expand(); return; }
+  // Ignore clicks on buttons inside pet-area
+  if (e.target.closest('button')) return;
+  // Debounce — max one gesture per 800ms
+  const now = Date.now();
+  if (now - _lastGestureTs < 800) return;
+  _lastGestureTs = now;
+
+  // Pick a random gesture
+  const g = PET_GESTURES[Math.floor(Math.random() * PET_GESTURES.length)];
+
+  // Animate the pet container
+  const container = document.getElementById('pet-container');
+  if (container) {
+    container.style.animation = 'none';
+    // Force reflow
+    void container.offsetWidth;
+    container.style.animation = g.anim;
+    setTimeout(() => { container.style.animation = ''; }, 800);
+  }
+
+  // Show floating emoji pop above pet-area
+  const petArea = document.getElementById('pet-area');
+  if (petArea) {
+    const pop = document.createElement('div');
+    pop.textContent = g.emoji;
+    pop.style.cssText = [
+      'position:absolute',
+      `left:${40 + Math.random() * 40}%`,
+      'top:8px',
+      'font-size:22px',
+      'pointer-events:none',
+      'z-index:50',
+      'animation:ff-float .8s ease-out forwards',
+      'opacity:1',
+    ].join(';');
+    petArea.appendChild(pop);
+    setTimeout(() => pop.remove(), 850);
+  }
+
+  // Update pet status text briefly
+  if (petStatus) {
+    const prev = petStatus.textContent;
+    const prevColor = petStatus.style.color;
+    petStatus.textContent  = g.label;
+    petStatus.style.color  = 'var(--sapPositiveColor)';
+    setTimeout(() => {
+      petStatus.textContent = prev;
+      petStatus.style.color = prevColor;
+    }, 1800);
+  }
+
+  // Tamagotchi: strengthen bond + update stats panel
+  if (tamagotchiEnabled) {
+    tamaEngine.petPet();
+    // Show a bond toast every 5th click
+    const bond = tamaEngine.getStats().bond;
+    if (bond >= 90 && Math.random() < 0.3) {
+      TAMA_UI.showEventToast('💙 Bond is maxing out! BAPI really trusts you.', 'happy');
+    }
+  }
+}
+
 // ── Wire events ───────────────────────────────────────────────────────────────
 document.getElementById('btn-close').addEventListener('click',     () => window.bapi.hide());
 document.getElementById('btn-minimize').addEventListener('click',  () => window.bapi.minimize());
 document.getElementById('btn-hide').addEventListener('click',      () => window.bapi.hide());
 document.getElementById('tb-gear').addEventListener('click',       openSettings);
 document.getElementById('tb-collapse').addEventListener('click',   collapse);
-document.getElementById('pet-area').addEventListener('click', (e) => { if (document.body.classList.contains('collapsed')) expand(); });
+document.getElementById('pet-area').addEventListener('click', onPetClicked);
 document.getElementById('btn-expand').addEventListener('click',    expand);
 document.getElementById('settings-back').addEventListener('click', closeSettings);
 document.getElementById('save-btn').addEventListener('click',      saveSettings);

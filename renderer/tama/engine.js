@@ -234,6 +234,16 @@ class TamagotchiEngine {
     this.train(1);
   }
 
+  // Called when user clicks/taps the pet directly
+  petPet() {
+    if (!this._enabled) return;
+    this.stats.bond       = Math.min(100, this.stats.bond       + 4);
+    this.stats.happiness  = Math.min(100, this.stats.happiness  + 5);
+    this._addXP(1);
+    this._notify();
+    this.save();
+  }
+
   // ── XP + Evolution ────────────────────────────────────────────────────────
   _addXP(amount) {
     this.stats.xp    = (this.stats.xp || 0) + amount;
