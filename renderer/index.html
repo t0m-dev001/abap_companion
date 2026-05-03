@@ -293,9 +293,14 @@ body.collapsed #collapse-expand{display:flex}
 /* ════════════════════════════════════════════════════════
    PET AREA
    ════════════════════════════════════════════════════════ */
-#pet-area{background:var(--sapBaseColor);padding:14px 0 8px;text-align:center;
+#pet-area{background:var(--sapBaseColor);padding:14px 0 8px;text-align:center;cursor:pointer;
   border-bottom:1px solid var(--sapList_BorderColor);
   flex-shrink:0;position:relative;overflow:hidden;transition:background .25s}
+#pet-area:hover::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(ellipse at center,color-mix(in srgb,var(--sapHighlightColor) 8%,transparent) 0%,transparent 70%);
+  border-radius:inherit;
+}
 #pet-area::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.016) 2px,rgba(255,255,255,.016) 4px)}
 #pet-wrap{display:inline-block;animation:floatAnim 3.4s ease-in-out infinite}
@@ -343,11 +348,26 @@ body.collapsed #collapse-expand{display:flex}
 .msg-user{align-self:flex-end;background:var(--_msg_user_bg);
   color:var(--sapTextColor);border-color:var(--sapList_BorderColor);margin-left:8%}
 .msg-thinking{opacity:.5;font-style:italic}
-.msg-expand-btn{position:absolute;bottom:4px;right:5px;background:none;border:none;
-  color:var(--sapContent_LabelColor);font-family:"SAP-icons";font-size:.75rem;
-  cursor:pointer;opacity:0;transition:opacity .15s;line-height:1;padding:2px}
-.msg:hover .msg-expand-btn{opacity:.8}
-.msg-expand-btn:hover{color:var(--sapHighlightColor);opacity:1!important}
+/* ── 3 message action buttons — right-aligned row at bottom ── */
+.msg-actions{
+  position:absolute;bottom:3px;right:4px;
+  display:flex;align-items:center;gap:1px;
+  opacity:0;transition:opacity .15s;
+}
+.msg:hover .msg-actions{opacity:1}
+.msg-action-btn{
+  background:none;border:none;
+  color:var(--sapContent_LabelColor);
+  font-size:.75rem;cursor:pointer;
+  padding:2px 3px;border-radius:3px;
+  transition:color .12s,background .12s;
+  line-height:1;
+}
+.msg-action-btn:hover{color:var(--sapHighlightColor);background:var(--sapList_HoverBackground)}
+/* Keep old class names working for compatibility */
+.msg-expand-btn,.msg-copy-btn,.msg-save-btn{
+  position:static;opacity:1;
+}
 
 /* ════════════════════════════════════════════════════════
    INPUT BAR — SAP Footer Toolbar
@@ -594,7 +614,68 @@ body.collapsed #collapse-expand{display:flex}
   font-family:var(--sapFontFamily);
 }
 
+
+/* ── Phase 1: Inline code blocks in chat messages ── */
+.msg code {
+  font-family:'Courier New',Courier,monospace;
+  font-size:.75rem;
+  background:var(--sapGroup_ContentBackground);
+  color:var(--sapHighlightColor);
+  padding:1px 5px;
+  border-radius:3px;
+  border:1px solid var(--sapContent_ForegroundBorderColor);
+}
+.msg pre {
+  font-family:'Courier New',Courier,monospace;
+  font-size:.75rem;
+  background:var(--sapGroup_ContentBackground);
+  border:1px solid var(--sapContent_ForegroundBorderColor);
+  border-left:3px solid var(--sapHighlightColor);
+  border-radius:var(--sapElement_BorderRadius);
+  padding:8px 10px;
+  overflow-x:auto;
+  white-space:pre;
+  margin-top:4px;
+  line-height:1.5;
+  color:var(--sapHighlightColor);
+}
+.msg pre::-webkit-scrollbar{height:3px}
+.msg pre::-webkit-scrollbar-thumb{background:var(--sapScrollBar_FaceColor)}
+/* copy/save buttons are now inside .msg-actions flex row — see above */
+
+/* ── Phase 3: Input toolbar (new session + history + snippets) ── */
+#input-toolbar {
+  display:flex;align-items:center;
+  padding:4px 12px 0;
+  gap:6px;
+  background:var(--sapBaseColor);
+}
+.toolbar-btn {
+  background:none;border:none;
+  font-family:var(--sapFontFamily);font-size:.625rem;
+  color:var(--sapContent_LabelColor);cursor:pointer;
+  padding:2px 6px;border-radius:var(--sapElement_BorderRadius);
+  transition:color .15s,background .15s;
+  display:flex;align-items:center;gap:3px;
+  white-space:nowrap;
+}
+.toolbar-btn:hover{color:var(--sapHighlightColor);background:var(--sapList_HoverBackground)}
+
+/* ── Language toggle pill ── */
+#lang-pill {
+  margin-left:auto;
+  background:var(--sapButton_Background);
+  border:1px solid var(--sapButton_BorderColor);
+  border-radius:var(--sapButton_BorderRadius);
+  font-family:var(--sapFontFamily);font-size:.6rem;font-weight:700;
+  color:var(--sapButton_TextColor);
+  padding:1px 7px;cursor:pointer;
+  transition:background .15s;
+}
+#lang-pill:hover{background:var(--sapButton_Hover_Background)}
+
 /* ════ KEYFRAMES ════ */
+@keyframes ff-float{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-30px);opacity:0}}
 @keyframes floatAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 @keyframes bounceAnim{0%,100%{transform:translateY(0)}35%{transform:translateY(-12px)}65%{transform:translateY(-5px)}}
 @keyframes blinkEye{0%,88%,100%{transform:scaleY(1)}93%{transform:scaleY(.07)}}
@@ -644,6 +725,18 @@ body.collapsed #collapse-expand{display:flex}
   <div id="chat-area"></div>
 
   <!-- Input Bar -->
+  <div id="input-toolbar">
+    <button class="toolbar-btn" id="btn-new-session" title="Start new chat session">
+      <span class="si" style="font-size:.75rem">&#xe043;</span> New
+    </button>
+    <button class="toolbar-btn" id="btn-history" title="Session history">
+      <span class="si" style="font-size:.75rem">&#xe03d;</span> History
+    </button>
+    <button class="toolbar-btn" id="btn-snippets" title="Snippet vault">
+      <span class="si" style="font-size:.75rem">&#xe1a5;</span> Snippets
+    </button>
+    <span id="lang-pill" title="Toggle language">EN</span>
+  </div>
   <div id="input-bar">
     <input id="user-input" type="text" placeholder="Ask BAPI…" autocomplete="off" spellcheck="false">
     <button id="send-btn" title="Send (Enter)"><span class="si">&#xe044;</span></button>
@@ -658,6 +751,7 @@ body.collapsed #collapse-expand{display:flex}
     </div>
     <div id="settings-body">
 
+      <!-- AI Provider -->
       <div class="s-group">
         <label class="s-label">AI Provider</label>
         <select class="s-input" id="inp-provider" style="cursor:pointer">
@@ -666,6 +760,7 @@ body.collapsed #collapse-expand{display:flex}
         </select>
       </div>
 
+      <!-- API Key -->
       <div class="s-group">
         <label class="s-label">API Key</label>
         <input class="s-input" id="inp-apikey" type="password" placeholder="Paste your key here…" spellcheck="false" autocomplete="off">
@@ -673,6 +768,7 @@ body.collapsed #collapse-expand{display:flex}
         <div id="api-status"></div>
       </div>
 
+      <!-- Model -->
       <div class="s-group">
         <label class="s-label">Model</label>
         <div style="display:flex;gap:6px">
@@ -687,51 +783,53 @@ body.collapsed #collapse-expand{display:flex}
         <div id="model-hint"></div>
       </div>
 
+      <!-- Language -->
+      <div class="s-group">
+        <label class="s-label">Response Language</label>
+        <select class="s-input" id="inp-language" style="cursor:pointer">
+          <option value="en">🇬🇧 English</option>
+          <option value="id">🇮🇩 Bahasa Indonesia</option>
+          <option value="auto">🌐 Auto-detect</option>
+        </select>
+        <div class="s-hint">BAPI will respond in the selected language</div>
+      </div>
+
       <hr class="s-divider">
 
-      <!-- SAP Theme selector — 5 visual tiles -->
+      <!-- SAP Theme -->
       <div class="s-group">
         <label class="s-label">SAP Theme</label>
         <div class="theme-grid">
           <div class="theme-swatch ts-eve" data-theme="sap_horizon_dark" title="Evening Horizon — S/4HANA 2022+">
-            <div class="sw-shell"></div>
-            <div class="sw-body"><span class="sw-lbl" style="color:#0070f2">EVE</span></div>
+            <div class="sw-shell"></div><div class="sw-body"><span class="sw-lbl" style="color:#0070f2">EVE</span></div>
           </div>
           <div class="theme-swatch ts-qtz" data-theme="sap_fiori_3_dark" title="Quartz Dark — SAP Fiori 3">
-            <div class="sw-shell"></div>
-            <div class="sw-body"><span class="sw-lbl" style="color:#0a6ed1">QTZ</span></div>
+            <div class="sw-shell"></div><div class="sw-body"><span class="sw-lbl" style="color:#0a6ed1">QTZ</span></div>
           </div>
           <div class="theme-swatch ts-blz" data-theme="sap_belize_deep" title="Belize Deep — SAP Fiori 2 · flat corners">
-            <div class="sw-shell"></div>
-            <div class="sw-body"><span class="sw-lbl" style="color:#427cac">BLZ</span></div>
+            <div class="sw-shell"></div><div class="sw-body"><span class="sw-lbl" style="color:#427cac">BLZ</span></div>
           </div>
           <div class="theme-swatch ts-hch" data-theme="sap_horizon_hcb" title="High Contrast Black — Horizon">
-            <div class="sw-shell"></div>
-            <div class="sw-body"><span class="sw-lbl" style="color:#00d9f5">HCH</span></div>
+            <div class="sw-shell"></div><div class="sw-body"><span class="sw-lbl" style="color:#00d9f5">HCH</span></div>
           </div>
           <div class="theme-swatch ts-hcq" data-theme="sap_fiori_3_hcb" title="High Contrast Black — Quartz · flat corners">
-            <div class="sw-shell"></div>
-            <div class="sw-body"><span class="sw-lbl" style="color:#6fa8ff">HCQ</span></div>
+            <div class="sw-shell"></div><div class="sw-body"><span class="sw-lbl" style="color:#6fa8ff">HCQ</span></div>
           </div>
         </div>
         <div style="margin-top:5px;font-size:.6rem;color:var(--sapContent_LabelColor);line-height:1.6">
-          <b style="color:var(--sapTextColor)">EVE</b> Evening Horizon (S/4HANA 2022+) &nbsp;
-          <b style="color:var(--sapTextColor)">QTZ</b> Quartz Dark (Fiori 3) &nbsp;
-          <b style="color:var(--sapTextColor)">BLZ</b> Belize Deep (Fiori 2, flat) &nbsp;
-          <b style="color:var(--sapTextColor)">HCH/HCQ</b> High Contrast Black
+          <b style="color:var(--sapTextColor)">EVE</b> Evening Horizon · <b style="color:var(--sapTextColor)">QTZ</b> Quartz Dark · <b style="color:var(--sapTextColor)">BLZ</b> Belize Deep · <b style="color:var(--sapTextColor)">HCH/HCQ</b> High Contrast
         </div>
       </div>
-
 
       <!-- Pet Design -->
       <div class="s-group">
         <label class="s-label">Pet Design</label>
         <div class="pet-grid">
-          <div class="pet-swatch" data-pet="pixel" title="Retro Pixel — classic 8-bit Tamagotchi style">
+          <div class="pet-swatch" data-pet="pixel" title="Retro Pixel — classic 8-bit Tamagotchi">
             <div class="pet-swatch-icon">🕹️</div>
             <div class="pet-swatch-label">Retro<br>Pixel</div>
           </div>
-          <div class="pet-swatch" data-pet="fiori" title="Fiori Float — SAP Fiori-style rotating crystal">
+          <div class="pet-swatch" data-pet="fiori" title="Fiori Float — SAP Fiori rotating crystal">
             <div class="pet-swatch-icon">💎</div>
             <div class="pet-swatch-label">Fiori<br>Float</div>
           </div>
@@ -741,14 +839,11 @@ body.collapsed #collapse-expand{display:flex}
             <span class="pet-swatch-badge">WIP</span>
           </div>
         </div>
-        <div style="margin-top:4px;font-size:.6rem;color:var(--sapContent_LabelColor);line-height:1.5">
-          <b style="color:var(--sapTextColor)">Retro Pixel</b> — classic Tamagotchi, SAP GUI native &nbsp;
-          <b style="color:var(--sapTextColor)">Fiori Float</b> — modern Fiori-aligned crystal &nbsp;
-          <b style="color:var(--sapTextColor)">Desk Toy</b> — 3D holographic robot (WIP)
-        </div>
       </div>
 
       <hr class="s-divider">
+
+      <!-- Window Opacity -->
       <div class="s-group">
         <label class="s-label">Window Opacity</label>
         <div class="opacity-row">
@@ -761,6 +856,7 @@ body.collapsed #collapse-expand{display:flex}
 
       <hr class="s-divider">
 
+      <!-- Reminders -->
       <div class="s-group">
         <label class="s-label">
           <span class="si" style="font-size:.75rem;margin-right:4px">&#xe05d;</span>
@@ -775,13 +871,21 @@ body.collapsed #collapse-expand{display:flex}
 
       <hr class="s-divider">
 
+      <!-- Toggles -->
       <div class="s-group">
         <div class="s-row">
-          <div>
-            <div class="s-row-label">Reminders enabled</div>
-            <div class="s-row-sub">Auto-fire at scheduled times</div>
-          </div>
+          <div><div class="s-row-label">Reminders enabled</div><div class="s-row-sub">Auto-fire at scheduled times</div></div>
           <div class="toggle" id="toggle-reminders"><div class="toggle-thumb"></div></div>
+        </div>
+        <div class="s-row">
+          <div>
+            <div class="s-row-label">
+              <span class="si" style="font-size:.875rem;margin-right:4px;vertical-align:middle">&#xe05c;</span>
+              Tamagotchi Mode
+            </div>
+            <div class="s-row-sub">Pet needs · Feeding · Mini-games · Evolution · Streaks</div>
+          </div>
+          <div class="toggle" id="toggle-tamagotchi"><div class="toggle-thumb"></div></div>
         </div>
         <div class="s-row" style="border-bottom:none">
           <div><div class="s-row-label">Launch on Windows startup</div></div>
@@ -818,6 +922,11 @@ body.collapsed #collapse-expand{display:flex}
 
 </div>
 <div id="resize-hint"></div>
+<script src="tama/engine.js"></script>
+<script src="tama/ui.js"></script>
+<script src="tama/games.js"></script>
+<script src="sessions.js"></script>
+<script src="snippets.js"></script>
 <script src="pets/pixel.js"></script>
 <script src="pets/fiori.js"></script>
 <script src="pets/desktoy.js"></script>
